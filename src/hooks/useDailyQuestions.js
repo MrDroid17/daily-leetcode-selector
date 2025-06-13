@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { LeetCodeData } from "../LeetCodeData";
+import { LeetCodeSolved, LeetCodeBlind75 } from "../LeetCodeData";
 
-const NUMBER_OF_QUESTIONS = 3; // Number of questions to display
+const NUMBER_OF_QUESTIONS = 5; // Number of questions to display
 
 
 function getRandomQuestions() {
-    return LeetCodeData.sort(() => 0.5 - Math.random()).slice(0, NUMBER_OF_QUESTIONS);
+    return [...LeetCodeSolved, ...LeetCodeBlind75].sort(() => 0.5 - Math.random()).slice(0, NUMBER_OF_QUESTIONS);
 }
 
 export function useDailyQuestions() {
@@ -20,7 +20,12 @@ export function useDailyQuestions() {
 
         if (storedDate === today && storedQuestions) {
             // Load questions from localStorage
-            setQuestions(JSON.parse(storedQuestions));
+            try {
+                const parsed = JSON.parse(storedQuestions);
+                setQuestions(Array.isArray(parsed) ? parsed : []);
+            } catch {
+                setQuestions([]);
+            }
         } else {
             // Generate new questions and save to localStorage
             const newQuestions = getRandomQuestions();

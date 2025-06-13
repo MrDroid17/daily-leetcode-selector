@@ -33,7 +33,8 @@ function App() {
           <tr>
             <th>Title</th>
             <th>Difficulty</th>
-            <th>Submitted Count</th>
+            {/* <th>Submitted Count</th> */}
+            <th>Status</th>
             <th>Tags</th>
           </tr>
         </thead>
@@ -50,11 +51,14 @@ function App() {
                   {question.title}
                 </a>
               </td>
-              <td>{question.difficulty}</td>
-              <td>{question.numSubmitted}</td>
+              <td className={`difficulty ${question.difficulty.toLowerCase()}`}>
+                {question.difficulty}
+              </td>
+              {/* <td>{question.numSubmitted ? question.numSubmitted : '-'}</td> */}
+              <td className={(question.questionStatus === 'SOLVED' || question.status === 'SOLVED') ? 'green' : 'red'}>{question.questionStatus || question.status}</td>
               <td>
-                {question.topicTags.map((tag, index) => (
-                  <span key={index} className="tag-chip">
+                {(question.topicTags || []).map((tag, index) => (
+                  <span key={question.questionFrontendId + index} className="tag-chip">
                     {tag.name}
                   </span>
                 ))}
@@ -68,22 +72,24 @@ function App() {
         <RefreshCcw className="button-icon" /> Update Daily Questions
       </button>
 
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <p>Are you sure you want to <strong>Change Daily LeetCode Questions</strong>?</p>
-            <div className="modal-buttons">
-              <button onClick={confirmRefresh} className="button confirm-button">
-                Yes
-              </button>
-              <button onClick={cancelRefresh} className="button cancel-button">
-                No
-              </button>
+      {
+        isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <p>Are you sure you want to <strong>Change Daily LeetCode Questions</strong>?</p>
+              <div className="modal-buttons">
+                <button onClick={confirmRefresh} className="button confirm-button">
+                  Yes
+                </button>
+                <button onClick={cancelRefresh} className="button cancel-button">
+                  No
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }
 
