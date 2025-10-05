@@ -5,7 +5,8 @@ const NUMBER_OF_QUESTIONS = 5; // Number of questions to display
 
 
 function getRandomQuestions() {
-    return [...LeetCodeSolved, ...LeetCodeBlind75].sort(() => 0.5 - Math.random()).slice(0, NUMBER_OF_QUESTIONS);
+    // return [...LeetCodeSolved, ...LeetCodeBlind75].sort(() => 0.5 - Math.random()).slice(0, NUMBER_OF_QUESTIONS);
+    return [...LeetCodeSolved].sort(() => 0.5 - Math.random()).slice(0, NUMBER_OF_QUESTIONS);
 }
 
 export function useDailyQuestions() {

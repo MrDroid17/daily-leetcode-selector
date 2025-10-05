@@ -1,0 +1,466 @@
+[
+    {
+        "id": 121,
+        "question": "## What would be the output of the following code?\n\n```javascript\nlet c=0;\n\nlet id = setInterval(() => {\n\tconsole.log(c++)\n},200)\n\nsetTimeout(() => {\n\tclearInterval(id)\n},2000)\n```",
+        "example": "```javascript\n// setInterval and clearInterval examples\nlet counter = 0;\n\n// Basic interval\nlet intervalId = setInterval(() => {\n    console.log('Count:', counter++);\n    \n    if (counter >= 5) {\n        clearInterval(intervalId);\n        console.log('Interval cleared');\n    }\n}, 500);\n\n// Interval with timeout cleanup\nlet messageInterval = setInterval(() => {\n    console.log('Repeating message');\n}, 300);\n\nsetTimeout(() => {\n    clearInterval(messageInterval);\n    console.log('Messages stopped');\n}, 1500);\n\n// Self-clearing interval\nfunction createSelfClearingInterval(fn, interval, maxTimes) {\n    let count = 0;\n    let id = setInterval(() => {\n        fn();\n        count++;\n        if (count >= maxTimes) {\n            clearInterval(id);\n        }\n    }, interval);\n    return id;\n}\n\ncreateeSelfClearingInterval(() => {\n    console.log('Limited execution');\n}, 200, 3);\n\n// Using Promise with interval\nfunction intervalPromise(fn, interval, duration) {\n    return new Promise((resolve) => {\n        let id = setInterval(fn, interval);\n        setTimeout(() => {\n            clearInterval(id);\n            resolve();\n        }, duration);\n    });\n}\n\nintervalPromise(() => console.log('Tick'), 100, 1000)\n    .then(() => console.log('Done'));\n```",
+        "solution": "**Answer: The above program will print 0 to 9 sequentially.**\n\n**Explanation:**\n- `setInterval` executes the callback every 200ms, printing and incrementing `c`\n- `setTimeout` clears the interval after 2000ms\n- In 2000ms, with 200ms intervals, the callback runs approximately 10 times (2000/200 = 10)\n- Starting with `c=0`, it prints: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9\n- After 2000ms, `clearInterval` stops further executions",
+        "category": "Asynchronous",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 122,
+        "question": "## What is the output of the following code?\n\n```javascript\nconsole.log(\"Start\");\nconst p = new Promise((resolve) => {\n  console.log(\"Inside Promise\");\n  resolve(\"Resolved!\");\n});\np.then((message) => console.log(message));\nconsole.log(\"End\");\n```",
+        "example": "```javascript\n// Microtasks (like .then()) always run before macrotasks (like setTimeout).\nconsole.log('1');\nsetTimeout(() => console.log('4'), 0);\nPromise.resolve().then(() => console.log('3'));\nconsole.log('2');\n// Output: 1, 2, 3, 4\n```",
+        "solution": "**Output:**\n```\nStart\nInside Promise\nEnd\nResolved!\n```\n\n**Explanation:**\n1. The `Promise` constructor's executor function runs **synchronously**. That's why \"Inside Promise\" is logged immediately after \"Start\".\n2. The `.then()` callback is a **microtask**. It's placed in the microtask queue and will only run after the current synchronous script has finished executing.\n3. Therefore, the script continues, logging \"End\".\n4. After the main script is done, the event loop checks the microtask queue and executes the `.then()` callback, logging \"Resolved!\".",
+        "category": "Event Loop",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 123,
+        "question": "## What is the output of the following code?\n\n```javascript\nconsole.log(x);\nvar x = 5;\na();\nfunction a() {\n  console.log(\"test\");\n}\n```",
+        "example": "```javascript\n// Hoisting in action\nconsole.log(myVar); // undefined\nmyFunc(); // 'Hoisted!'\n\nvar myVar = 'value';\nfunction myFunc() {\n  console.log('Hoisted!');\n}\n```",
+        "solution": "**Output:**\n```\nundefined\ntest\n```\n\n**Explanation:**\n- **Variable Hoisting:** `var x` declarations are \"hoisted\" (moved to the top of their scope) during the compilation phase, but their assignments are not. So, `console.log(x)` runs before `x` is assigned the value `5`, resulting in `undefined`.\n- **Function Hoisting:** `function a() { ... }` declarations are also hoisted, including their entire definition. This means you can call the function `a()` before it's physically defined in the code.",
+        "category": "Hoisting",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 124,
+        "question": "## What is the output of the following code?\n\n```javascript\nfunction outer() {\n  let count = 0;\n  return function inner() {\n    count++;\n    console.log(count);\n  };\n}\nconst fn = outer();\nfn();\nfn();\n```",
+        "example": "```javascript\nfunction createIdGenerator() {\n  let id = 0;\n  return () => {\n    id += 1;\n    return id;\n  };\n}\nconst nextId = createIdGenerator();\nconsole.log(nextId()); // 1\nconsole.log(nextId()); // 2\n```",
+        "solution": "**Output:**\n```\n1\n2\n```\n\n**Explanation:**\nThis is a classic example of a closure. When `outer()` is called, it creates a scope containing the `count` variable. It returns the `inner` function, which \"closes over\" the scope of `outer`, maintaining a persistent reference to the `count` variable even after `outer()` has finished executing. Each time `fn()` is called, it accesses and modifies the *same* `count` variable.",
+        "category": "Closures",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 125,
+        "question": "## What is the output of the following code?\n\n```javascript\nconsole.log(a);\nvar a = 5;\nfunction a() {\n  console.log(\"Hello\");\n}\n```",
+        "example": "```javascript\n// Function declarations are hoisted with higher precedence than var declarations.\nconsole.log(myVar); // ƒ myVar() { ... }\n\nvar myVar = 'text';\nfunction myVar() {\n  return 'function';\n}\n\nconsole.log(myVar); // 'text'\n```",
+        "solution": "**Output:**\n```\nƒ a() { console.log(\"Hello\"); }\n```\n\n**Explanation:**\nBoth the function declaration and the variable declaration are hoisted. However, **function declarations are hoisted before variable declarations**. During compilation, `function a()` is hoisted first. Then, `var a` is hoisted, but since a variable named `a` already exists, this declaration is effectively ignored. When `console.log(a)` is executed, `a` holds the reference to the hoisted function.",
+        "category": "Hoisting",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 126,
+        "question": "## What is the output of the following code?\n\n```javascript\nfun();\nconst fun = () => {\n  console.log('fun function');\n}\n```",
+        "example": "```javascript\n// Temporal Dead Zone (TDZ) example\ntry {\n  console.log(myLetVar); // ReferenceError\n} catch (e) {\n  console.log(e.message);\n}\nlet myLetVar = 10;\n```",
+        "solution": "**Output:**\n```\nReferenceError: Cannot access 'fun' before initialization\n```\n\n**Explanation:**\nVariables declared with `let` and `const` are hoisted, but they are not initialized. They exist in a \"temporal dead zone\" (TDZ) from the start of the block until the declaration is encountered. Trying to access `fun` before its declaration results in a `ReferenceError`. Only function declarations (`function fun() {}`) are fully hoisted and callable before their definition.",
+        "category": "Hoisting",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 127,
+        "question": "## What is the output of the following code?\n\n```javascript\nfun();\nfunction fun() {\n  console.log('fun function');\n}\n```",
+        "example": null,
+        "solution": "**Output:**\n```\nfun function\n```\n\n**Explanation:**\nThis works because **function declarations are fully hoisted**, including their body. The entire function is moved to the top of its scope during compilation, so it is available to be called anywhere within that scope.",
+        "category": "Hoisting",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 128,
+        "question": "## What is the output of the following code?\n\n```javascript\nconst x = 10;\nfunction fun() {\n  const y = 20;\n  return function () {\n    console.log(x + y);\n  }\n}\nfun()();\n```",
+        "example": null,
+        "solution": "**Output:**\n```\n30\n```\n\n**Explanation:**\nThe inner anonymous function is a closure. It has access to its own scope, the scope of its parent function `fun` (where `y` is defined), and the global scope (where `x` is defined). The expression `fun()` calls the outer function and returns the inner function. The second `()` immediately invokes that returned inner function, which then accesses both `x` and `y` to perform the calculation.",
+        "category": "Closures",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 129,
+        "question": "## What is the output of the following code?\n\n```javascript\nasync function hello() {\n  for (let i = 4; i > 0; i--) {\n    let data = await new Promise((res, rej) => { \n      setTimeout(function () { res(i) }, i * 1000); \n    })\n    console.log(data)\n  }\n  console.log('bye')\n}\nhello()\n```",
+        "example": null,
+        "solution": "**Output:**\n```\n(after 4 seconds) 4\n(after 3 more seconds) 3\n(after 2 more seconds) 2\n(after 1 more second) 1\nbye\n```\n\n**Explanation:**\nThe `await` keyword inside the `for` loop pauses the execution of the `hello` function until the promise resolves. The loop iterations run sequentially, not in parallel, because of the `await`.",
+        "category": "Async/Await",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 130,
+        "question": "## What is the output of the following code?\n\n```javascript\nvar b = 2;\nfunction outer() {\n    b++;\n    console.log(b);\n    var b = 3;\n    console.log(b);\n}\n\nouter();\n```",
+        "example": null,
+        "solution": "**Output:**\n```\nNaN\n3\n```\n\n**Explanation:**\nThe `var b` declaration inside `outer()` is hoisted to the top of the function, creating a local variable that shadows the global `b`. The function effectively becomes:\n```javascript\nfunction outer() {\n    var b; // hoisted declaration (undefined)\n    b++;   // undefined++ = NaN\n    console.log(b); // NaN\n    b = 3; // assignment\n    console.log(b); // 3\n}\n```\nThe local `var b` shadows the global `b = 2`, so the global variable is never accessed inside the function.",
+        "category": "Hoisting",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 131,
+        "question": "## What is the output of the following code?\n\n```javascript\nlet b = 2;\nfunction outer() {\n    b++;\n    console.log(b);\n    let b = 3;\n    console.log(b);\n}\n\nouter();\n```",
+        "example": null,
+        "solution": "**Output:**\n```\nReferenceError: Cannot access 'b' before initialization\n```\n\n**Explanation:**\nThis demonstrates the **Temporal Dead Zone (TDZ)** with `let`. The `let b` declaration is hoisted but not initialized, creating a dead zone from the start of the function until the declaration line. When `b++` tries to access `b`, it's in the TDZ, causing a `ReferenceError`.",
+        "category": "Hoisting",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 132,
+        "question": "## Implement a `sum` function that works for both `sum(1)(2)` and `sum(1, 2)`.",
+        "example": "```javascript\n// A more advanced currying function\nfunction add(a) {\n  return function(b) {\n    return b ? add(a + b) : a;\n  }\n}\nconsole.log(add(1)(2)(3)()); // 6\n```",
+        "solution": "**Implementation:**\n```javascript\nfunction sum(a, b) {\n    // If both arguments are provided, return the sum\n    if (arguments.length === 2) {\n        return a + b;\n    }\n    \n    // If only one argument is provided, return a curried function\n    if (arguments.length === 1) {\n        return function(b) {\n            return a + b;\n        };\n    }\n}\n\nconsole.log(sum(1, 2));  // 3\nconsole.log(sum(1)(2));  // 3\n```\n**Explanation:**\nThis function checks the number of arguments passed. If two arguments are received, it returns their sum directly. If only one argument is received, it returns a new function that 'remembers' the first argument (via a closure) and waits for the second argument.",
+        "category": "Functional Programming",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 133,
+        "question": "## What is a generator function in JavaScript?",
+        "example": "```javascript\nfunction* idGenerator() {\n  let id = 1;\n  while (true) {\n    yield id++; // Pauses here and returns the value of id\n  }\n}\n\nconst gen = idGenerator();\nconsole.log(gen.next().value); // 1\nconsole.log(gen.next().value); // 2\n```",
+        "solution": "A generator function is a special type of function that can be **paused and resumed**. It is defined using the `function*` syntax and uses the `yield` keyword to pause its execution and return a value.\n\nWhen you call a generator function, it returns a **generator object** with a `.next()` method. Each time you call `.next()`, the function executes until it hits a `yield` statement, returns the yielded value, and then pauses.\n\n**Key Features:**\n- **Lazy Evaluation:** Values are computed only when requested.\n- **Memory Efficient:** Can represent infinite sequences without storing all values in memory.",
+        "category": "ES6",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 134,
+        "question": "## Explain React Fibre Architecture.",
+        "example": null,
+        "solution": "React Fibre is a complete rewrite of React's core reconciliation algorithm. Its main goal is to enable **incremental rendering** and better handling of scheduling and prioritization of updates.\n\n**Key Benefits:**\n1. **Pausable Work:** Can pause rendering work to handle high-priority events (like user input) and then resume.\n2. **Prioritized Updates:** Assigns different priorities to different types of updates (e.g., user input is higher priority than data fetching).\n3. **Time Slicing:** Breaks work into chunks and yields control back to the browser to prevent blocking the main thread.\n4. **Concurrent Features:** Enables features like Suspense, `useTransition`, and `useDeferredValue`.\n\nIt works by breaking down the reconciliation process into smaller units of work called \"fibers.\" This allows React to be more responsive and avoid janky user experiences in complex applications.",
+        "category": "React Internals",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 135,
+        "question": "## What's the difference between `useEffect` and `useLayoutEffect` in React?",
+        "example": "```jsx\nfunction Tooltip() {\n  const ref = useRef();\n  const [tooltipHeight, setTooltipHeight] = useState(0);\n\n  useLayoutEffect(() => {\n    // Measure the DOM and update state synchronously before the browser paints\n    const { height } = ref.current.getBoundingClientRect();\n    setTooltipHeight(height);\n  }, []);\n\n  // Using useEffect here could cause a flicker as the tooltip repositions after the initial paint.\n\n  return <div ref={ref}>...</div>;\n}\n```",
+        "solution": "Both hooks are for side effects, but they run at different times:\n\n**`useEffect`**\n- Runs **asynchronously** *after* React has rendered the component and the browser has painted the screen.\n- This is the default choice for 99% of cases as it does not block browser painting.\n- Use for: API calls, setting up subscriptions.\n\n**`useLayoutEffect`**\n- Runs **synchronously** *after* React has performed all DOM mutations but *before* the browser has painted the screen.\n- It blocks the browser from painting.\n- Use for: Measuring DOM elements and synchronously re-rendering to prevent visual flicker.",
+        "category": "React Hooks",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 136,
+        "question": "## What happens when you pass `null` as the dependency array to `useEffect`?",
+        "example": "```jsx\n// This is a common mistake\nconst dependencies = someCondition ? [count] : null;\n\nuseEffect(() => {\n  // This will run on every render when someCondition is false\n}, dependencies);\n```",
+        "solution": "When you pass `null` (or `undefined`, or omit the argument entirely) as the dependency array to `useEffect`, the effect will run **after every single render**.\n\n- `[]` (empty array): Runs **once** after initial render.\n- `[dep]` (with dependencies): Runs when any dependency changes.\n- `null` or `undefined`: Runs after **every** render.\n\nThis is usually not what you want and can cause performance issues if the effect is expensive.",
+        "category": "React Hooks",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 137,
+        "question": "## Implement a retry mechanism for a Promise-based API call in JavaScript.",
+        "example": "```javascript\n// Usage\nasync function getUserData() {\n  try {\n    const response = await fetchWithRetry('https://api.example.com/data');\n    const data = await response.json();\n    console.log('Success:', data);\n  } catch (error) {\n    console.error('Failed after multiple retries:', error);\n  }\n}\n```",
+        "solution": "**Solution with Exponential Backoff:**\n```javascript\nasync function fetchWithRetry(url, options, retries = 3, delay = 500) {\n  try {\n    const response = await fetch(url, options);\n    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);\n    return response;\n  } catch (error) {\n    if (retries > 0) {\n      await new Promise(resolve => setTimeout(resolve, delay));\n      // Recursively call with one less retry and double the delay\n      return fetchWithRetry(url, options, retries - 1, delay * 2);\n    } else {\n      throw error;\n    }\n  }\n}\n```\n**Explanation:**\nThis `async/await` function attempts the fetch call. If it fails, it waits for a specified `delay` before trying again. The delay doubles after each failed attempt (exponential backoff) to avoid overwhelming a struggling server. If all retries fail, it throws the final error.",
+        "category": "Promises",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 138,
+        "question": "## How do you implement HTTP Interceptors in a React application?",
+        "example": "```javascript\n// Using the configured instance in a component\nimport api from '../api/axiosConfig';\n\nfunction UserProfile() {\n  useEffect(() => {\n    api.get('/user/profile') // Interceptor automatically adds auth token\n      .then(response => { /* ... */ })\n      .catch(error => { /* ... */ });\n  }, []);\n  // ...\n}\n```",
+        "solution": "React doesn't have built-in interceptors; this functionality is provided by data-fetching libraries like **Axios**.\n\nInterceptors allow you to globally modify requests before they are sent and responses before they are handled.\n\n**Code Example (using Axios):**\n```javascript\n// src/api/axiosConfig.js\nimport axios from 'axios';\n\nconst api = axios.create({ baseURL: 'https://api.example.com' });\n\n// Request Interceptor: Add auth token to every request\napi.interceptors.request.use(config => {\n  const token = localStorage.getItem('authToken');\n  if (token) {\n    config.headers['Authorization'] = `Bearer ${token}`;\n  }\n  return config;\n});\n\n// Response Interceptor: Handle global errors like 401 Unauthorized\napi.interceptors.response.use(\n  response => response,\n  error => {\n    if (error.response && error.response.status === 401) {\n      // Redirect to login page\n    }\n    return Promise.reject(error);\n  }\n);\n\nexport default api;\n```",
+        "category": "React",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 139,
+        "question": "## What are Custom Hooks in React and why are they useful?",
+        "example": "```jsx\n// Using the custom hook in a component\nimport useFetch from '../hooks/useFetch';\n\nfunction PostList() {\n  const { data: posts, loading, error } = useFetch('https://api.example.com/posts');\n\n  if (loading) return <div>Loading...</div>;\n  if (error) return <div>Error: {error.message}</div>;\n\n  return <ul>{posts && posts.map(post => <li key={post.id}>{post.title}</li>)}</ul>;\n}\n```",
+        "solution": "A custom hook is a **reusable JavaScript function whose name starts with `use`** and that can call other hooks (like `useState`, `useEffect`).\n\n**Why they are useful:** Custom hooks allow you to extract component logic into reusable functions. If you find yourself writing the same stateful logic (e.g., fetching data, managing form state) in multiple components, you should extract it into a custom hook.\n\n**Example `useFetch` Hook:**\n```javascript\n// src/hooks/useFetch.js\nimport { useState, useEffect } from 'react';\n\nfunction useFetch(url) {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState(null);\n\n  useEffect(() => {\n    const fetchData = async () => {\n      try {\n        const response = await fetch(url);\n        const result = await response.json();\n        setData(result);\n      } catch (err) {\n        setError(err);\n      } finally {\n        setLoading(false);\n      }\n    };\n    fetchData();\n  }, [url]);\n\n  return { data, loading, error };\n}\n```",
+        "category": "React Hooks",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 140,
+        "question": "## Explain effective error handling patterns in a Node.js Express application.",
+        "example": "```javascript\n// In a route handler\napp.get('/users/:id', async (req, res, next) => {\n  try {\n    const user = await findUser(req.params.id);\n    if (!user) {\n      const error = new Error('User not found');\n      error.statusCode = 404;\n      return next(error); // Pass error to the global handler\n    }\n    res.json(user);\n  } catch (error) {\n    next(error); // Pass unexpected errors\n  }\n});\n```",
+        "solution": "The most important pattern for a web server is **centralized error handling** using a global middleware.\n\n1.  **In Route Handlers, Pass Errors to `next()`:** Instead of handling errors inside each route, you pass them to Express's `next()` function.\n\n2.  **Create a Global Error-Handling Middleware:** This special middleware must have **four arguments** (`err`, `req`, `res`, `next`) and must be defined *after* all other routes and middleware.\n\n**Global Handler Example:**\n```javascript\n// In your main app.js file\n\n// ... all your other app.use() and routes\n\n// Global Error Handling Middleware\napp.use((err, req, res, next) => {\n  console.error(err.stack); // Log the full error for debugging\n\n  const statusCode = err.statusCode || 500;\n  const message = err.message || 'Something went wrong!';\n\n  res.status(statusCode).json({\n    status: 'error',\n    statusCode,\n    message,\n  });\n});\n```\nThis pattern keeps your route handlers clean and provides a single, consistent place to manage how errors are formatted and sent to the client.",
+        "category": "Node.js",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 141,
+        "question": "## Implement a function to reverse the digits of a number.",
+        "example": "```javascript\nconsole.log(getReverseNo(123));   // Output: 321\nconsole.log(getReverseNo(-456));  // Output: -654\nconsole.log(getReverseNo(1000));  // Output: 1\n```",
+        "solution": "**Implementation using Math:**\n```javascript\nfunction getReverseNo(num) {\n    let isNegative = num < 0;\n    let result = 0;\n    num = Math.abs(num);\n    \n    while (num > 0) {\n        result = result * 10 + num % 10;\n        num = Math.floor(num / 10);\n    }\n    \n    return isNegative ? -result : result;\n}\n```\n**Explanation:**\nThis approach avoids string conversion. It repeatedly takes the last digit of the number using the modulo operator (`% 10`) and adds it to the `result` after multiplying the `result` by 10. The number is then shrunk by dividing by 10. The sign is handled separately.",
+        "category": "DSA",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 142,
+        "question": "## What is the output of `isNaN(\"Hello\")` and `isNaN(\"100\")` and why?",
+        "example": "```javascript\n// The modern, safer alternative\nconsole.log(Number.isNaN(\"Hello\")); // false (it's a string, not the number NaN)\nconsole.log(Number.isNaN(NaN));     // true\n```",
+        "solution": "**Output:**\n```\ntrue\nfalse\n```\n\n**Explanation:**\nThe global `isNaN()` function has quirky behavior due to **type coercion**. Before checking, it first attempts to convert the value to a number.\n\n1. **`isNaN(\"Hello\")`:**\n   - It first converts `Number(\"Hello\")`, which results in `NaN`.\n   - Then it checks `isNaN(NaN)`, which is `true`.\n\n2. **`isNaN(\"100\")`:**\n   - It first converts `Number(\"100\")`, which results in the number `100`.\n   - Then it checks `isNaN(100)`, which is `false`.\n\nFor a stricter check without type coercion, use `Number.isNaN()`.",
+        "category": "JavaScript Concepts",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 143,
+        "question": "## Which is the correct way to update state multiple times in React, and why?\n\n**Option A:**\n```jsx\nsetCount(prev => prev + 1);\nsetCount(prev => prev + 1);\n```\n\n**Option B:**\n```jsx\nsetCount(count + 1);\nsetCount(count + 1);\n```",
+        "example": "```jsx\n// Incorrect: This will only increment the count by 1, not 2.\nconst handleClick = () => {\n  setCount(count + 1); // Reads count as 0, schedules update to 1\n  setCount(count + 1); // Also reads count as 0, schedules update to 1\n};\n```",
+        "solution": "**Answer: Option A (Functional Updates) is correct.**\n\n**Explanation:**\nReact **batches** state updates for performance. Multiple `setCount` calls within the same event handler are grouped together.\n\n- **Direct Updates (Option B):** When you call `setCount(count + 1)` multiple times, each call reads the *same* `count` value from the current render. The updates effectively overwrite each other, and the count only increments once.\n\n- **Functional Updates (Option A):** When you use the functional form `setCount(prev => prev + 1)`, React ensures that the `prev` value passed to each updater function is the latest state from the queue. This guarantees that the updates are chained correctly, and the count increments for each call.",
+        "category": "React Hooks",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 144,
+        "question": "## Explain the difference between `defer` and `async` attributes on a `<script>` tag.",
+        "example": "```html\n<!-- Best practice setup -->\n<head>\n  <!-- Core app logic, order matters -->\n  <script src=\"library.js\" defer></script>\n  <script src=\"main.js\" defer></script>\n\n  <!-- Independent 3rd-party script -->\n  <script src=\"analytics.js\" async></script>\n</head>\n```",
+        "solution": "Both `defer` and `async` prevent scripts from blocking HTML parsing by downloading them asynchronously.\n\n**`async`**\n- **Execution Timing:** Executes **as soon as it finishes downloading**, which can interrupt HTML parsing.\n- **Execution Order:** **No guaranteed order**. Scripts run in the order they finish downloading.\n- **Best For:** Independent, third-party scripts where order doesn't matter (e.g., analytics, ads).\n\n**`defer`**\n- **Execution Timing:** Executes only **after the HTML document is fully parsed**, just before the `DOMContentLoaded` event.\n- **Execution Order:** **Guaranteed order**. Scripts execute in the order they appear in the HTML.\n- **Best For:** Scripts that need to interact with the DOM or depend on other scripts.",
+        "category": "JavaScript Concepts",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 145,
+        "question": "## Implement the 'Who Likes It?' function.\n\n**Requirements:**\n- `likes([])` -> `'no one likes this'`\n- `likes(['Peter'])` -> `'Peter likes this'`\n- `likes(['Jacob', 'Alex'])` -> `'Jacob and Alex like this'`\n- `likes(['Max', 'John', 'Mark'])` -> `'Max, John and Mark like this'`\n- `likes(['Alex', 'Jacob', 'Mark', 'Max'])` -> `'Alex, Jacob and 2 others like this'`",
+        "example": null,
+        "solution": "**Solution:**\n```javascript\nconst likes = names => {\n  switch (names.length) {\n    case 0:\n      return 'no one likes this';\n    case 1:\n      return `${names[0]} likes this`;\n    case 2:\n      return `${names[0]} and ${names[1]} like this`;\n    case 3:\n      return `${names[0]}, ${names[1]} and ${names[2]} like this`;\n    default:\n      return `${names[0]}, ${names[1]} and ${names.length - 2} others like this`;\n  }\n};\n```\n**Explanation:**\nA `switch` statement provides a clean way to handle the different formatting rules based on the number of names in the input array. The `default` case handles the scenario with 4 or more names by calculating the remaining count.",
+        "category": "DSA",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 146,
+        "question": "## Find the contiguous subarray with the largest product and return the product.\n\n**Example:**\n`Input: nums = [2,3,-2,4]`\n`Output: 6` (`[2,3]` has the largest product)",
+        "example": "```javascript\n// Test cases\nmaxProduct([2,3,-2,4]); // 6\nmaxProduct([-2,0,-1]); // 0\nmaxProduct([-3,-1,-1]); // 3\n```",
+        "solution": "**Optimized Solution:**\n```javascript\nfunction maxProduct(nums) {\n  let maxSoFar = nums[0];\n  let minSoFar = nums[0];\n  let result = nums[0];\n\n  for (let i = 1; i < nums.length; i++) {\n    const curr = nums[i];\n    // If current number is negative, the previous min becomes the new max and vice-versa\n    const tempMax = Math.max(curr, maxSoFar * curr, minSoFar * curr);\n    minSoFar = Math.min(curr, maxSoFar * curr, minSoFar * curr);\n\n    maxSoFar = tempMax;\n    result = Math.max(result, maxSoFar);\n  }\n  return result;\n}\n```\n**Explanation:**\nThis problem is tricky because of negative numbers. A large negative number multiplied by another negative number becomes a large positive number. Therefore, at each step, we must track both the `maxSoFar` and `minSoFar` product ending at the current position. The overall `result` is the largest `maxSoFar` seen during the iteration.",
+        "category": "DSA",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 147,
+        "question": "## How do you stop a JavaScript object from being modified?",
+        "example": "```javascript\nconst user = { name: 'Alex', address: { city: 'NY' } };\nObject.freeze(user);\n\nuser.name = 'Bob'; // Fails silently\nuser.address.city = 'LA'; // Succeeds!\n\nconsole.log(user.address.city); // 'LA'\n```",
+        "solution": "You can use `Object.freeze()` to make an object immutable. It prevents new properties from being added, existing properties from being removed, and existing properties from being changed.\n\n```javascript\nconst obj = { name: \"John\", age: 30 };\nObject.freeze(obj);\n\nobj.age = 40;      // Fails silently in non-strict mode\ndelete obj.name;   // Fails silently\n\nconsole.log(obj);  // { name: \"John\", age: 30 }\n```\n**Important:** `Object.freeze()` is **shallow**. It does not freeze nested objects. For deep immutability, you would need to write a recursive function that freezes all nested objects.",
+        "category": "JavaScript Concepts",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 148,
+        "question": "## What is the output of this code, and why?\n\n```javascript\nfunction myFunction() {\n  setTimeout(function () {\n    console.log(x);\n    console.log(y);\n  }, 1000);\n  var x = 'hello';\n  let y = 'world';\n}\n\nmyFunction();\n```",
+        "example": null,
+        "solution": "**Output:**\n```\nhello\nworld\n```\n\n**Explanation:**\nThe callback function passed to `setTimeout` creates a **closure**. A closure \"remembers\" the scope in which it was created. In this case, it maintains a live reference to the scope of `myFunction`, even after `myFunction` has finished executing.\n\nWhen the `setTimeout` callback eventually runs after 1 second, it looks up `x` and `y` in its closed-over scope and finds their assigned values. The scope is not destroyed just because the parent function has returned.",
+        "category": "Closures",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 149,
+        "question": "## How do you remove duplicates from a sorted array in-place?",
+        "example": "```javascript\nlet nums = [0,0,1,1,1,2,2,3,3,4];\nconst k = removeDuplicates(nums);\n// k = 5\n// nums is now [0,1,2,3,4,....]\n```",
+        "solution": "**Solution using Two Pointers:**\n```javascript\nconst removeDuplicates = function (nums) {\n  if (nums.length === 0) return 0;\n\n  let insertIndex = 1; // Position to place the next unique element\n  for (let i = 1; i < nums.length; i++) {\n    // If the current element is different from the previous one\n    if (nums[i] !== nums[i - 1]) {\n      nums[insertIndex] = nums[i];\n      insertIndex++;\n    }\n  }\n  return insertIndex; // The new length of the unique part of the array\n};\n```\n**Explanation:**\nThis approach uses a 'slow' pointer (`insertIndex`) and a 'fast' pointer (`i`). The fast pointer iterates through the array, and when it finds an element that is different from the one before it, that unique element is copied to the position of the slow pointer. The slow pointer is then incremented. This effectively overwrites duplicates with the next unique elements.",
+        "category": "DSA",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 150,
+        "question": "## What is the Node.js cluster module and how does it handle concurrency?",
+        "example": "```javascript\nconst cluster = require('cluster');\nconst http = require('http');\nconst os = require('os');\n\nif (cluster.isMaster) {\n  const numCPUs = os.cpus().length;\n  console.log(`Master ${process.pid} is running`);\n  for (let i = 0; i < numCPUs; i++) {\n    cluster.fork(); // Create a worker\n  }\n} else {\n  // Workers can share any TCP connection\n  http.createServer((req, res) => {\n    res.end(`Handled by worker ${process.pid}`);\n  }).listen(3000);\n  console.log(`Worker ${process.pid} started`);\n}\n```",
+        "solution": "Node.js runs JavaScript in a single thread. To take advantage of multi-core systems, it provides the **cluster module**.\n\n**How it works:**\n- The cluster module allows you to create child processes (**workers**) that all share the same server port.\n- A single **master process** is responsible for forking the worker processes (typically one for each CPU core).\n- The master process listens on a port and distributes incoming connections to the workers in a round-robin fashion (by default). This is the key to handling concurrency.\n\n**Concurrency:**\nWhile each worker process is itself single-threaded, running multiple workers in parallel allows the application to handle multiple requests simultaneously across different CPU cores. This significantly increases the server's throughput and resilience, as the master can restart a worker if it crashes.",
+        "category": "Node.js",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 151,
+        "question": "## What is a Higher-Order Component (HOC) in React? Create a HOC to inject an `isAuthorised` prop.",
+        "example": "```jsx\n// Component that will be wrapped\nfunction Dashboard({ isAuthorised }) {\n  return <div>{isAuthorised ? 'Welcome, Admin!' : 'Access Denied'}</div>;\n}\n\n// Using the HOC\nconst ProtectedDashboard = withAuthorization(Dashboard);\n\n// Render in your app\n<ProtectedDashboard />\n```",
+        "solution": "A **Higher-Order Component (HOC)** is an advanced React pattern for reusing component logic. It is a function that takes a component as an argument and returns a new, enhanced component.\n\n**HOC to inject `isAuthorised` prop:**\n```jsx\n// This is your authorization logic\nconst checkAuth = () => {\n  // In a real app, check for a token, user role, etc.\n  return true; \n};\n\n// The HOC function\nfunction withAuthorization(WrappedComponent) {\n  // It returns a new component...\n  return function(props) {\n    const isAuthorised = checkAuth();\n    \n    // ...that renders the original component with the new prop\n    return <WrappedComponent {...props} isAuthorised={isAuthorised} />;\n  };\n}\n```\n**Explanation:**\nThe `withAuthorization` function takes a component (`WrappedComponent`) and returns a new functional component. This new component calculates the `isAuthorised` status and then renders the original `WrappedComponent`, passing through any original props along with the new `isAuthorised` prop.",
+        "category": "React",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 152,
+        "question": "## Does JavaScript support function overloading? What happens when you declare a function with the same name twice?",
+        "example": "```javascript\nfunction test(a, b) {\n  return a + b;\n}\n\n// This declaration overwrites the first one\nfunction test(a, b, c) {\n  return a + b + c;\n}\n\ntest(1, 2); // Returns NaN (1 + 2 + undefined)\n```",
+        "solution": "No, JavaScript **does not support traditional function overloading**. When you declare multiple functions with the same name in the same scope, the **last declaration simply overwrites all previous ones**.\n\nWhen the code is executed, only the final version of the function exists. If you call it with a different number of arguments than it expects, JavaScript's flexible argument handling will apply (e.g., missing arguments will be `undefined`).",
+        "category": "JavaScript Concepts",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 153,
+        "question": "## How do you check if two arrays are permutations of each other?",
+        "example": "```javascript\nconst arr1 = [1, 2, 3];\nconst arr2 = [3, 1, 2];\nconst arr3 = [1, 2, 4];\n\narePermutations(arr1, arr2); // true\narePermutations(arr1, arr3); // false\n```",
+        "solution": "**Solution by Sorting:**\nThe most straightforward way is to sort both arrays and then compare them element by element.\n\n```javascript\nfunction arePermutations(array1, array2) {\n  if (array1.length !== array2.length) {\n    return false;\n  }\n  // .slice() creates a copy so the original arrays are not modified\n  const sortedArr1 = array1.slice().sort();\n  const sortedArr2 = array2.slice().sort();\n\n  for (let i = 0; i < sortedArr1.length; i++) {\n    if (sortedArr1[i] !== sortedArr2[i]) {\n      return false;\n    }\n  }\n  return true;\n}\n```\n**Explanation:**\nIf two arrays are permutations of each other, they must contain the same elements with the same frequencies. Sorting them will result in two identical arrays, which can then be easily compared.",
+        "category": "DSA",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 154,
+        "question": "## Given a string of digits, return all possible letter combinations that the number could represent on a telephone keypad.",
+        "example": "```javascript\nletterCombinations(\"23\"); \n// Output: [\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]\n```",
+        "solution": "**Solution using Backtracking:**\nThis problem is a classic use case for a recursive backtracking algorithm.\n\n```javascript\nfunction letterCombinations(digits) {\n  if (!digits) return [];\n\n  const mapping = {\n    '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',\n    '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'\n  };\n  const result = [];\n  \n  function backtrack(index, currentCombination) {\n    if (index === digits.length) {\n      result.push(currentCombination);\n      return;\n    }\n\n    const letters = mapping[digits[index]];\n    for (const letter of letters) {\n      backtrack(index + 1, currentCombination + letter);\n    }\n  }\n\n  backtrack(0, '');\n  return result;\n}\n```\n**Explanation:**\nThe `backtrack` function explores every possible combination. It builds a combination character by character. For each digit, it loops through its possible letters and makes a recursive call for the next digit. When it reaches the end of the digits string, a complete combination is formed and added to the results.",
+        "category": "DSA",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 155,
+        "question": "## What is a BFF (Backend for Frontend)?",
+        "example": "```javascript\n// Conceptual BFF endpoint in Express.js\napp.get('/api/dashboard/:userId', async (req, res) => {\n  // 1. Aggregate data from multiple microservices\n  const [userResponse, ordersResponse] = await Promise.all([\n    axios.get(`/users/${req.params.userId}`),\n    axios.get(`/orders?userId=${req.params.userId}`)\n  ]);\n\n  // 2. Transform data for the UI\n  const dashboardData = {\n    userName: userResponse.data.name,\n    recentOrders: ordersResponse.data.map(o => ({ orderId: o.id, date: o.createdAt }))\n  };\n\n  res.json(dashboardData);\n});\n```",
+        "solution": "The **Backend for Frontend (BFF)** is an architectural pattern where a dedicated backend service is created to serve a specific frontend application (e.g., a web app or a mobile app).\n\nInstead of a single, general-purpose API, you create multiple, specialized backends. The BFF acts as a middle layer that aggregates data from various downstream microservices, formats it specifically for the client's UI needs, and provides an optimized API for that particular frontend. This simplifies the client application by offloading data aggregation and transformation logic to the server.",
+        "category": "System Design",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 156,
+        "question": "## Can multiple reducers be used in React-Redux? If so, how are they connected to the store?",
+        "example": "```javascript\n// Accessing state from a combined reducer\nimport { useSelector } from 'react-redux';\n\nfunction Cart() {\n  const cartItems = useSelector(state => state.cart.items);\n  const user = useSelector(state => state.users.user);\n  // ...\n}\n```",
+        "solution": "Yes, using multiple reducers is the standard and recommended practice in Redux. This is achieved using the `combineReducers` utility function.\n\n**How it works:**\n1.  **Slice Reducers**: You create separate reducer functions to manage logical \"slices\" of your state (e.g., `usersReducer`, `productsReducer`).\n2.  **`combineReducers`**: You pass an object to `combineReducers` where the keys define the shape of your state object and the values are the corresponding reducer functions.\n3.  **Root Reducer**: `combineReducers` generates a single \"root reducer\" function that you pass to `createStore`.\n\n```javascript\n// reducers/index.js\nimport { combineReducers } from 'redux';\nimport { userReducer } from './userReducer';\nimport { cartReducer } from './cartReducer';\n\nconst rootReducer = combineReducers({\n  users: userReducer, // state.users will be managed by userReducer\n  cart: cartReducer,   // state.cart will be managed by cartReducer\n});\n\nexport default rootReducer;\n```",
+        "category": "React-Redux",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 157,
+        "question": "## Why is Node.js considered very fast for I/O-intensive applications?",
+        "example": "```javascript\n// Non-blocking file read\nfs.readFile('large-file.txt', (err, data) => {\n  // This callback runs later, without blocking the main thread.\n  console.log('File read complete.');\n});\nconsole.log('This line runs immediately.');\n```",
+        "solution": "Node.js's speed comes primarily from its **non-blocking, asynchronous I/O model** built on a **single-threaded event loop**.\n\n1.  **V8 Engine**: It's built on Google's V8, which compiles JavaScript to fast native machine code.\n2.  **Non-Blocking I/O**: When Node.js encounters an I/O operation (like a database query or file read), it doesn't wait for it to complete. It delegates the task to the underlying system and immediately moves on to handle the next request.\n3.  **Event Loop**: When the I/O operation finishes, a callback is placed in an event queue. The event loop continuously checks this queue and executes the callbacks, sending results back to clients.\n\nThis model allows a single Node.js thread to handle thousands of concurrent connections efficiently, as the thread is never idle waiting for I/O. This makes it ideal for web servers, APIs, and other I/O-bound tasks.",
+        "category": "Node.js",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 158,
+        "question": "## What are all the possible ways to reverse a string in JavaScript?",
+        "example": null,
+        "solution": "Here are the most common methods:\n\n**1. Using Built-in Methods (Most Common):**\nThis is the most idiomatic approach.\n```javascript\nfunction reverseStringBuiltIn(str) {\n  return str.split('').reverse().join('');\n}\n```\n\n**2. Using a `for` Loop:**\nThis is often more performant as it avoids creating an intermediate array.\n```javascript\nfunction reverseStringLoop(str) {\n  let newString = \"\";\n  for (let i = str.length - 1; i >= 0; i--) {\n    newString += str[i];\n  }\n  return newString;\n}\n```\n\n**3. Using Recursion:**\nThis is more of an academic exercise, elegant but less efficient.\n```javascript\nfunction reverseStringRecursive(str) {\n  return (str === \"\") ? \"\" : reverseStringRecursive(str.substr(1)) + str.charAt(0);\n}\n```",
+        "category": "JavaScript Concepts",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 159,
+        "question": "## Task 1: Flatten a Nested Object\n\nWrite a function to flatten a nested object. The keys in the flattened object should be dot-separated strings representing the path to the value.\n\n**Input:**\n```javascript\n{ a: 1, b: { c: 2, d: { e: 3 } } }\n```\n\n**Output:**\n```javascript\n{ \"a\": 1, \"b.c\": 2, \"b.d.e\": 3 }\n```",
+        "example": "```javascript\nfunction flattenObject(obj, parentKey = '', result = {}) {\n  for (const key in obj) {\n    if (obj.hasOwnProperty(key)) {\n      const newKey = parentKey ? `${parentKey}.${key}` : key;\n      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {\n        flattenObject(obj[key], newKey, result);\n      } else {\n        result[newKey] = obj[key];\n      }\n    }\n  }\n  return result;\n}\n\nconst nestedObj = { a: 1, b: { c: 2, d: { e: 3 } } };\nconsole.log(flattenObject(nestedObj));\n// Output: { \"a\": 1, \"b.c\": 2, \"b.d.e\": 3 }```",
+        "solution": "**Answer: Recursive Object Flattening**\n\n**Explanation:** This can be solved using a recursive function that keeps track of the current path. When a non-object value is found, the path and value are added to the result. The function handles nested objects by building dot-separated keys representing the path to each value.",
+        "category": "Objects",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 160,
+        "question": "## Task 2: Find the First Recurring Character\n\nGiven an array, find the first character that appears more than once.\n\n**Input:**\n```javascript\n[2, 5, 1, 2, 3, 5, 1]\n```\n\n**Output:**\n```javascript\n2\n```",
+        "example": "```javascript\nfunction findFirstRecurring(arr) {\n  const seen = new Set();\n  for (let i = 0; i < arr.length; i++) {\n    if (seen.has(arr[i])) {\n      return arr[i];\n    }\n    seen.add(arr[i]);\n  }\n  return undefined; // No recurring character found\n}\n\nconst inputArray = [2, 5, 1, 2, 3, 5, 1];\nconsole.log(findFirstRecurring(inputArray)); // Output: 2```",
+        "solution": "**Answer: Using Set for O(n) Solution**\n\n**Explanation:** The most efficient way to solve this is by using a `Set` to keep track of the numbers we've seen. We iterate through the array, and for each element, we check if it's already in our set. The first one we find is our answer. This approach has a time complexity of O(n).",
+        "category": "Arrays",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 161,
+        "question": "## Task 3: String Compression\n\nImplement a basic string compression method using the counts of repeated characters.\n\n**Input:**\n```javascript\n\"aabcccccaaa\"\n```\n\n**Output:**\n```javascript\n\"a2b1c5a3\"\n```",
+        "example": "```javascript\nfunction compressString(str) {\n  if (!str) return \"\";\n  \n  let compressed = '';\n  let count = 1;\n\n  for (let i = 0; i < str.length; i++) {\n    if (str[i] === str[i + 1]) {\n      count++;\n    } else {\n      compressed += str[i] + count;\n      count = 1;\n    }\n  }\n  return compressed;\n}\n\nconsole.log(compressString(\"aabcccccaaa\")); // Output: \"a2b1c5a3\"```",
+        "solution": "**Answer: Character Counting Compression**\n\n**Explanation:** Iterate through the string, keeping a count of consecutive characters. When the character changes or the string ends, append the character and its count to the result string. This creates a compressed representation of the original string.",
+        "category": "Strings",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 162,
+        "question": "## Task 4: Find the First Non-Repeated Character\n\nWrite a function that takes a string and returns the first character that is not repeated anywhere in the string.\n\n**Example:**\n```javascript\n\"swiss\" // ➝ \"w\"\n```",
+        "example": "```javascript\nfunction firstNonRepeatedCharacter(s) {\n  const charCount = {};\n  \n  for (const char of s) {\n    charCount[char] = (charCount[char] || 0) + 1;\n  }\n  \n  for (const char of s) {\n    if (charCount[char] === 1) {\n      return char;\n    }\n  }\n  \n  return null;\n}\n\nconsole.log(firstNonRepeatedCharacter(\"swiss\")); // \"w\"```",
+        "solution": "**Answer: Two-Pass Character Frequency**\n\n**Explanation:** First, create a frequency map of all characters in the string. Then, iterate through the string a second time and return the first character that has a count of 1 in your map. This ensures we find the first non-repeated character in the original order.",
+        "category": "Strings",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 163,
+        "question": "## Task 5: Valid Parentheses\n\nGiven a string `s` containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\n**Example:**\n```javascript\nInput: s = \"([])\" // Output: true\nInput: s = \"(]\"   // Output: false\n```",
+        "example": "```javascript\nfunction isValidParentheses(s) {\n    const stack = [];\n    const map = {\n        \"(\": \")\",\n        \"[\": \"]\",\n        \"{\": \"}\",\n    };\n\n    for (let i = 0; i < s.length; i++) {\n        let char = s[i];\n        if (map[char]) {\n            stack.push(char);\n        } else {\n            let lastOpen = stack.pop();\n            if (char !== map[lastOpen]) {\n                return false;\n            }\n        }\n    }\n    return stack.length === 0;\n};\n\nconsole.log(isValidParentheses(\"()[]{}\"));   // true\nconsole.log(isValidParentheses(\"([)]\"));     // false```",
+        "solution": "**Answer: Stack-based Solution**\n\n**Explanation:** This is a classic use case for a stack data structure. Iterate through the string: if you see an opening bracket, push it onto the stack. If you see a closing bracket, check if the stack is empty or if its top element is the corresponding opening bracket. If it is, pop the stack. If not, the string is invalid. At the end, the string is valid only if the stack is empty.",
+        "category": "Data Structures",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 164,
+        "question": "## Task 6: Second Largest Number\n\nGiven an array of exam scores from a class of students, find the second-highest score without arranging the scores in ascending or descending order.\n\n**Example:**\n```javascript\nInput: arr = [85, 92, 78, 95, 88] // Output: 92\nInput: arr = [2,5,12,8,15]        // Output: 12\n```",
+        "example": "```javascript\nfunction findSecondLargest(arr) {\n  if (arr.length < 2) {\n    return \"Array should have at least two numbers.\";\n  }\n\n  let largest = -Infinity;\n  let secondLargest = -Infinity;\n\n  for (let i = 0; i < arr.length; i++) {\n    const currentNumber = arr[i];\n\n    if (currentNumber > largest) {\n      secondLargest = largest;\n      largest = currentNumber;\n    } else if (currentNumber > secondLargest && currentNumber !== largest) {\n      secondLargest = currentNumber;\n    }\n  }\n\n  return secondLargest;\n}\n\nconst numbers = [10, 5, 20, 8, 15];\nconst result = findSecondLargest(numbers);\nconsole.log(result); // Output: 15```",
+        "solution": "**Answer: Single Pass Algorithm**\n\n**Explanation:** The most efficient way to find the second-largest number without sorting is to iterate through the array just once. You'll need two variables: one to track the largest number and another to track the second largest. This approach has O(n) time complexity and O(1) space complexity.",
+        "category": "Arrays",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 165,
+        "question": "## Puzzle 1: Event Loop Output\n\nExplain the output of the following code snippet.\n\n```javascript\nconsole.log('Start');\n\nsetTimeout(() => {\n  console.log('setTimeout');\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log('Promise 1');\n}).then(() => {\n  console.log('Promise 2');\n});\n\nconsole.log('End');\n```",
+        "example": "```javascript\n// Event loop execution order demonstration\nconsole.log('1: Synchronous');\n\nsetTimeout(() => {\n  console.log('4: Macrotask (setTimeout)');\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log('3: Microtask (Promise)');\n});\n\nconsole.log('2: Synchronous');\n\n// Output order:\n// 1: Synchronous\n// 2: Synchronous\n// 3: Microtask (Promise)\n// 4: Macrotask (setTimeout)```",
+        "solution": "**Answer: Start, End, Promise 1, Promise 2, setTimeout**\n\n**Explanation:** The JavaScript event loop prioritizes tasks. Synchronous code runs first, then microtasks (like Promises), and finally macrotasks (like `setTimeout`). 1) Synchronous Code: 'Start' and 'End' are logged immediately. 2) Microtask Queue: Promise callbacks run next. 3) Macrotask Queue: setTimeout runs last.",
+        "category": "Asynchronous",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 166,
+        "question": "## Puzzle 2: Hoisting and Scope\n\nExplain the output of the following code snippet.\n\n```javascript\nlet x = 10;\nfunction check() {\n  console.log(x, 'myVar');\n  if (false) {\n    var x = 20;\n  }\n}\ncheck();\n```",
+        "example": "```javascript\n// Variable hoisting and shadowing demonstration\nvar global = 'outer';\n\nfunction demo() {\n  console.log(global); // undefined (not 'outer')\n  if (false) {\n    var global = 'inner'; // This declaration is hoisted\n  }\n}\n\n// After hoisting, it becomes:\nfunction demo() {\n  var global; // hoisted declaration\n  console.log(global); // undefined\n  if (false) {\n    global = 'inner'; // assignment (never executed)\n  }\n}\n\ndemo(); // Output: undefined```",
+        "solution": "**Answer: undefined 'myVar'**\n\n**Explanation:** The `var x = 20;` declaration inside the `check` function is hoisted to the top of its function scope. This means that within the `check` function, `x` is considered a local variable. However, only the declaration (`var x;`) is hoisted, not the initialization (`= 20`). When `console.log(x)` is called, it refers to the local, hoisted `x`, which has not yet been assigned a value. Therefore, its value is `undefined`.",
+        "category": "Hoisting",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 167,
+        "question": "## Puzzle 3: Event Loop Output (Part 2)\n\nExplain the output of the following code snippet.\n\n```javascript\nsetTimeout(function timeout() {\n  console.log('Timed out 1!');\n}, 0);\n\nPromise.resolve(1).then(function resolve() {\n  console.log('Resolved!');\n});\n\nsetTimeout(function timeout() {\n  console.log('Timed out 2!');\n}, 0);\n\nconsole.log('Last!');\n```",
+        "example": "```javascript\n// Multiple async operations execution order\nconsole.log('Sync 1');\n\nsetTimeout(() => console.log('Timeout 1'), 0);\nsetTimeout(() => console.log('Timeout 2'), 0);\n\nPromise.resolve().then(() => console.log('Promise 1'));\nPromise.resolve().then(() => console.log('Promise 2'));\n\nconsole.log('Sync 2');\n\n// Output:\n// Sync 1\n// Sync 2\n// Promise 1\n// Promise 2\n// Timeout 1\n// Timeout 2```",
+        "solution": "**Answer: Last!, Resolved!, Timed out 1!, Timed out 2!**\n\n**Explanation:** This follows the same event loop principles. 1) Synchronous Code: `console.log('Last!')` runs first. 2) Microtask Queue: The `Promise.resolve()` callback runs next, logging 'Resolved!'. 3) Macrotask Queue: The two `setTimeout` callbacks run after the microtask queue is empty, logging 'Timed out 1!' and then 'Timed out 2!' in the order they were defined.",
+        "category": "Asynchronous",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 168,
+        "question": "## Puzzle 4: 'this' Context\n\nExplain the output of the following code snippet.\n\n```javascript\nlet a = 40;\nlet obj = {\n    a: 10,\n    b: function(){ console.log(this.a) },\n    c: () => { console.log(this.a) }\n}\n\nobj.b();\nobj.c();\n```",
+        "example": "```javascript\n// Arrow functions vs regular functions 'this' binding\nvar globalVar = 'global';\n\nvar obj = {\n    localVar: 'local',\n    regularMethod: function() {\n        console.log('Regular:', this.localVar); // 'local'\n    },\n    arrowMethod: () => {\n        console.log('Arrow:', this.localVar); // undefined (global context)\n    }\n};\n\nobj.regularMethod(); // Regular: local\nobj.arrowMethod();   // Arrow: undefined```",
+        "solution": "**Answer: 10, 40**\n\n**Explanation:** The value of `this` depends on how the function is called. `obj.b()`: `b` is a traditional function. When called as a method of an object, `this` refers to the object itself (`obj`). Therefore, `this.a` is `obj.a`, which is 10. `obj.c()`: `c` is an arrow function. Arrow functions do not have their own `this` context; they inherit `this` from their surrounding lexical scope. Since `obj` is defined in the global scope, `this` refers to the global object, where `a` is 40.",
+        "category": "Functions",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 169,
+        "question": "## Concept 1: Numerical Sort\n\nHow do you correctly sort the following array of numbers in ascending order?\n\n```javascript\nlet arr = [1, 27, 3, 45, 2, 3];\n```",
+        "example": "```javascript\n// Incorrect default sort (string comparison)\nlet numbers = [1, 27, 3, 45, 2, 3];\nnumbers.sort();\nconsole.log(numbers); // [1, 2, 27, 3, 3, 45] - Wrong!\n\n// Correct numeric sort\nlet numbers2 = [1, 27, 3, 45, 2, 3];\nnumbers2.sort((a, b) => a - b);\nconsole.log(numbers2); // [1, 2, 3, 3, 27, 45] - Correct!\n\n// Descending order\nnumbers2.sort((a, b) => b - a);\nconsole.log(numbers2); // [45, 27, 3, 3, 2, 1]```",
+        "solution": "**Answer: arr.sort((a, b) => a - b)**\n\n**Explanation:** By default, the `Array.prototype.sort()` method sorts elements by converting them into strings and comparing their UTF-16 code unit values. This leads to incorrect numerical sorting (e.g., \"27\" comes before \"3\"). To sort numbers correctly, you must provide a compare function. For ascending order, the function `(a, b) => a - b` works perfectly.",
+        "category": "Arrays",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 170,
+        "question": "## Concept 2: Function Currying\n\nWhat is function currying? Provide a simple example.",
+        "example": "```javascript\n// Non-curried function\nconst add = (a, b, c) => a + b + c;\n\n// Curried version of the same function\nconst curriedAdd = (a) => (b) => (c) => a + b + c;\n\n// Create a specialized function by pre-loading the first argument\nconst add5 = curriedAdd(5);\nconsole.log(add5(10)(3)); // 18\n\n// Or call it all at once\nconsole.log(curriedAdd(5)(10)(3)); // 18\n\n// Practical example - API caller\nconst makeApiCall = (baseUrl) => (endpoint) => (params) => {\n  return fetch(`${baseUrl}/${endpoint}?${params}`);\n};\n\nconst apiCall = makeApiCall('https://api.example.com');\nconst userCall = apiCall('users');\nuserCall('id=123'); // Makes call to https://api.example.com/users?id=123```",
+        "solution": "**Answer: Function transformation technique**\n\n**Explanation:** Currying is a functional programming technique that transforms a function with multiple arguments into a sequence of nested functions, each taking a single argument. This allows you to create specialized, reusable functions by 'pre-loading' a function with some of its arguments. It enables partial application and function composition.",
+        "category": "Functions",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 171,
+        "question": "## PWC Q1: Object Keys and Type Coercion\n\nWhat will be the output of the following code? Explain why.\n\n```javascript\nlet a = {};\nlet b = { key: \"b\" };\nlet c = { key: \"c\" }; \na[b] = 123; \na[c] = 456; \nconsole.log(a[b]);\n```",
+        "example": "```javascript\n// Object key coercion demonstration\nlet obj = {};\nlet key1 = { id: 1 };\nlet key2 = { id: 2 };\nlet key3 = { id: 3 };\n\nobj[key1] = 'first';\nobj[key2] = 'second';\nobj[key3] = 'third';\n\nconsole.log(obj); // { '[object Object]': 'third' }\nconsole.log(obj[key1]); // 'third'\nconsole.log(obj[key2]); // 'third'\nconsole.log(obj[key3]); // 'third'\n\n// All objects become the same string key!```",
+        "solution": "**Answer: 456**\n\n**Explanation:** When using an object as a key in JavaScript, it gets converted to a string using the `toString()` method. Both objects `b` and `c` are converted to the string `\"[object Object]\"`. So `a[b]` and `a[c]` are actually the same key. When we assign `a[b] = 123`, we're setting `a[\"[object Object]\"] = 123`. Then `a[c] = 456` overwrites the same key with `456`. Therefore, `console.log(a[b])` outputs `456`.",
+        "category": "Objects",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 172,
+        "question": "## PWC Q2: setTimeout with var in Loop\n\nWhat will be the output of the following code? Explain the behavior.\n\n```javascript\nconst arr = [1, 2, 3, 4, 5];\n\nfor (var i = 0; i < arr.length; i++) {\n    setTimeout(function () { \n        console.log(i); \n    }, 1000);  \n}\n```",
+        "example": "```javascript\n// Closure problem with var\nfor (var i = 0; i < 3; i++) {\n    setTimeout(() => console.log('var:', i), 100);\n}\n// Output after 100ms: var: 3, var: 3, var: 3\n\n// Solution with let\nfor (let i = 0; i < 3; i++) {\n    setTimeout(() => console.log('let:', i), 100);\n}\n// Output after 100ms: let: 0, let: 1, let: 2\n\n// Solution with IIFE\nfor (var i = 0; i < 3; i++) {\n    (function(j) {\n        setTimeout(() => console.log('IIFE:', j), 100);\n    })(i);\n}\n// Output after 100ms: IIFE: 0, IIFE: 1, IIFE: 2```",
+        "solution": "**Answer: 5 5 5 5 5 (five times)**\n\n**Explanation:** `var` has function scope, not block scope. All setTimeout callbacks share the same `i` variable. The loop completes immediately, and `i` becomes `5` (the exit condition). After 1 second, all 5 setTimeout callbacks execute, but they all reference the same `i` which is now `5`. This is a classic JavaScript closure problem with `var` in loops.",
+        "category": "Scopes",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 173,
+        "question": "## PWC Q3: setTimeout with let in Loop\n\nWhat will be the output of the following code? How does it differ from the previous example?\n\n```javascript\nconst arr = [1, 2, 3, 4, 5];\n\nfor (let i = 0; i < arr.length; i++) {\n    setTimeout(function () { \n        console.log(i); \n    }, 1000);  \n}\n```",
+        "example": "```javascript\n// Block scope demonstration\nfor (let i = 0; i < 3; i++) {\n    console.log('Iteration:', i);\n    setTimeout(() => {\n        console.log('Timeout:', i); // Each has its own 'i'\n    }, 100);\n}\n\n// Immediate output:\n// Iteration: 0\n// Iteration: 1  \n// Iteration: 2\n\n// After 100ms:\n// Timeout: 0\n// Timeout: 1\n// Timeout: 2```",
+        "solution": "**Answer: 0 1 2 3 4 (in that order)**\n\n**Explanation:** `let` has block scope, so each iteration of the loop creates a new binding for `i`. Each setTimeout callback captures its own copy of `i` from its respective iteration. This means each callback remembers the value of `i` from when it was created. After 1 second, all callbacks execute with their respective captured values: 0, 1, 2, 3, 4. The `let` keyword creates a new lexical environment for each iteration, preventing the closure issue that occurs with `var`.",
+        "category": "Scopes",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 174,
+        "question": "## PWC Q4: Event Loop and Event-Driven Architecture\n\nExplain the JavaScript Event Loop and event-driven programming concepts. How do they work together?",
+        "example": "```javascript\n// Event-driven example\ndocument.addEventListener('click', function() {\n    console.log('Click handled!');\n});\n\n// Async operations\nsetTimeout(() => console.log('Timer'), 0);\nPromise.resolve().then(() => console.log('Promise'));\n\nconsole.log('Synchronous');\n\n// Output order:\n// Synchronous\n// Promise (microtask queue)\n// Timer (macrotask queue)\n// Click handled! (when user clicks)\n\n// Event loop components:\n// Call Stack → Microtask Queue → Macrotask Queue```",
+        "solution": "**Answer: Single-threaded asynchronous execution model**\n\n**Explanation:** **Event Loop:** JavaScript is single-threaded but can handle asynchronous operations through the Event Loop. It continuously checks the Call Stack and Task Queues, moving tasks from queues to the Call Stack when empty. **Event-Driven Programming:** Programs respond to events (user clicks, API responses, timer completions). Event handlers/listeners are registered to respond to specific events with non-blocking execution. **Key Components:** Call Stack (executes functions), Microtask Queue (Promises), Macrotask Queue (setTimeout, DOM events), Web APIs (handle async operations).",
+        "category": "Asynchronous",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 175,
+        "question": "## PWC Q5: MongoDB - Top 3 Students by Score\n\nWrite a MongoDB query to return the top 3 students who have the highest scores.\n\nAssume a collection called `students` with documents like:\n```javascript\n{ name: \"Alice\", score: 95 }\n{ name: \"Bob\", score: 87 }\n{ name: \"Charlie\", score: 92 }\n```",
+        "example": "```javascript\n// Method 1: Using find() with sort() and limit()\ndb.students.find().sort({ score: -1 }).limit(3);\n\n// Method 2: Using aggregation pipeline\ndb.students.aggregate([\n    { $sort: { score: -1 } },\n    { $limit: 3 }\n]);\n\n// Method 3: With projection (specific fields only)\ndb.students.find({}, { name: 1, score: 1, _id: 0 })\n           .sort({ score: -1 })\n           .limit(3);\n\n// Method 4: Aggregation with projection\ndb.students.aggregate([\n    { $sort: { score: -1 } },\n    { $limit: 3 },\n    { $project: { name: 1, score: 1, _id: 0 } }\n]);```",
+        "solution": "**Answer: db.students.find().sort({ score: -1 }).limit(3)**\n\n**Explanation:** The query uses `sort({ score: -1 })` to sort in descending order (-1 for desc, 1 for asc) and `limit(3)` to return only the first 3 documents. Performance optimization: Create an index on the `score` field using `db.students.createIndex({ score: -1 })`. Use projection to return only needed fields and consider compound indexes if filtering by multiple fields.",
+        "category": "Database",
+        "difficulty": "Easy"
+    },
+    {
+        "id": 176,
+        "question": "## Retrieve and Sort Numbers from a Nested Object\n\nGiven a deeply nested object, extract all numerical values and return them in an array sorted in descending order. The function should be able to handle any level of nesting.\n\n```javascript\nconst obj = {\n  a: { b: { c: 48 }, d: 11 },\n  e: { f: 100 },\n  g: 20\n};\n// Expected output: [100, 48, 20, 11]\n```",
+        "example": "```javascript\nfunction getNumbersAndSortDescending(data) {\n  const numbers = [];\n\n  function findNumbers(item) {\n    for (const key in item) {\n      if (typeof item[key] === 'object' && item[key] !== null) {\n        findNumbers(item[key]);\n      } else if (typeof item[key] === 'number') {\n        numbers.push(item[key]);\n      }\n    }\n  }\n\n  findNumbers(data);\n  return numbers.sort((a, b) => b - a); // Sort in descending order\n}\n\nconst obj = {\n  a: { b: { c: 48 }, d: 11 },\n  e: { f: 100 },\n  g: 20\n};\n\nconsole.log(getNumbersAndSortDescending(obj)); // [100, 48, 20, 11]```",
+        "solution": "**Answer: Recursive Object Traversal**\n\n**Explanation:** You can solve this by recursively traversing the object. If a value is an object, the function calls itself on that value. If the value is a number, it's added to a list. Finally, the list is sorted in descending order using `sort((a, b) => b - a)`. The recursive approach handles any level of nesting dynamically.",
+        "category": "Objects",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 177,
+        "question": "## Extract All Values of a Key 'C' from a Nested Object\n\nGiven a deeply nested object, find all values associated with the key 'c' and return them in an array. The code should be robust enough to handle additional levels of nesting.\n\n```javascript\nlet value = {\n  a: { b: { c: 10 }, d: { f: 20, c: 15 } },\n  j: { l: { c: 30 } },\n  k: { z: { c: 40, x: 44 }, h: { f: 10 } }\n};\n// Expected output: [10, 15, 30, 40]\n```",
+        "example": "```javascript\nfunction findAllCValues(obj) {\n  const result = [];\n  \n  function findValues(currentObj) {\n    if (typeof currentObj !== 'object' || currentObj === null) {\n      return;\n    }\n\n    for (const key in currentObj) {\n      if (key === 'c') {\n        result.push(currentObj[key]);\n      } else {\n        findValues(currentObj[key]);\n      }\n    }\n  }\n\n  findValues(obj);\n  return result;\n}\n\nlet value = {\n  a: { b: { c: 10 }, d: { f: 20, c: 15 } },\n  j: { l: { c: 30 } },\n  k: { z: { c: 40, x: 44 }, h: { f: 10 } }\n};\n\nconsole.log(findAllCValues(value)); // [10, 15, 30, 40]```",
+        "solution": "**Answer: Recursive Key Search**\n\n**Explanation:** The most efficient way to solve this is by using a recursive function that traverses the object. The function checks if the current property is an object. If it is, it calls itself recursively. If the property's key matches 'c', its value is added to the result array. This approach handles arbitrary nesting levels and collects all matching values in order of discovery.",
+        "category": "Objects",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 178,
+        "question": "## How to Reverse a String in JavaScript (All Possible Solutions)\n\nShow different methods to reverse a string in JavaScript, including built-in methods, loops, recursion, and modern approaches.\n\n**Input:** `\"hello\"`\n**Output:** `\"olleh\"`",
+        "example": "```javascript\n// Method 1: Built-in methods\nfunction reverseStringBuiltIn(str) {\n  return str.split('').reverse().join('');\n}\n\n// Method 2: For loop\nfunction reverseStringLoop(str) {\n  let newString = \"\";\n  for (let i = str.length - 1; i >= 0; i--) {\n    newString += str[i];\n  }\n  return newString;\n}\n\n// Method 3: Spread operator with for...of\nfunction reverseStringModern(str) {\n  let newString = '';\n  for (const char of [...str]) {\n    newString = char + newString;\n  }\n  return newString;\n}\n\n// Method 4: Recursion\nfunction reverseStringRecursive(str) {\n  if (str === \"\") return \"\";\n  return reverseStringRecursive(str.substr(1)) + str.charAt(0);\n}\n\nconsole.log(reverseStringBuiltIn(\"hello\")); // \"olleh\"```",
+        "solution": "### 1. Using Built-in Methods\n\nThis is the most common and idiomatic approach. It's clean and easy to read.\n\n* **`split('')`**: Converts the string into an array of individual characters.\n* **`reverse()`**: Reverses the order of the elements in the new array.\n* **`join('')`**: Joins the characters back together into a single string.\n\n```javascript\nfunction reverseStringBuiltIn(str) {\n  return str.split('').reverse().join('');\n}\n\nconsole.log(reverseStringBuiltIn(\"hello\")); // Output: \"olleh\"\n```\n\n**Note:** This method may not work correctly for complex Unicode characters (e.g., emojis) that are composed of multiple code points.\n\n-----\n\n### 2. Using a `for` Loop\n\nThis method is more performant as it avoids creating an intermediate array. It iterates through the string backward and builds a new string.\n\n```javascript\nfunction reverseStringLoop(str) {\n  let newString = \"\";\n  for (let i = str.length - 1; i >= 0; i--) {\n    newString += str[i];\n  }\n  return newString;\n}\n\nconsole.log(reverseStringLoop(\"world\")); // Output: \"dlrow\"\n```\n\n-----\n\n### 3. Using the Spread Operator and `for...of`\n\nThis is a modern and robust way to handle strings, especially those containing Unicode characters. The spread operator (`...str`) correctly breaks the string into an array of characters based on their Unicode code points, not just byte-by-byte.\n\n```javascript\nfunction reverseStringModern(str) {\n  let newString = '';\n  // The spread operator correctly handles Unicode characters\n  for (const char of [...str]) {\n    newString = char + newString;\n  }\n  return newString;\n}\n\nconsole.log(reverseStringModern(\"hello 👋\")); // Output: \"👋 olleh\"\n```\n\n-----\n\n### 4. Using Recursion\n\nThis method is more for demonstrating a recursive programming pattern than for practical use. It's elegant but can be less efficient due to function call overhead.\n\n* The function returns the first character concatenated with the result of calling itself on the rest of the string.\n* The base case for the recursion is an empty string, which returns itself.\n\n```javascript\nfunction reverseStringRecursive(str) {\n  if (str === \"\") {\n    return \"\";\n  } else {\n    return reverseStringRecursive(str.substr(1)) + str.charAt(0);\n  }\n}\n\nconsole.log(reverseStringRecursive(\"javascript\")); // Output: \"tpircsavaj\"\n```",
+        "category": "Strings",
+        "difficulty": "Easy"
+    }
+]
