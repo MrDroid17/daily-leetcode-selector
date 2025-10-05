@@ -1,0 +1,42 @@
+[
+    {
+        "id": 241,
+        "question": "## What are Branded Types (or Nominal Typing) in TypeScript?",
+        "example": "```typescript\ntype Brand<K, T> = K & { __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype ProductId = Brand<string, 'ProductId'>;\n\nfunction processUserId(id: UserId) { /* ... */ }\n\nconst userId = 'user-123' as UserId;\nconst productId = 'prod-456' as ProductId;\n\nprocessUserId(userId); // OK\n// processUserId(productId); // Error: Type 'ProductId' is not assignable to type 'UserId'.\n```",
+        "solution": "TypeScript's type system is structural ('duck typing'). Branded Types are a pattern to simulate nominal typing, where two types with the same structure are not considered compatible. By adding a unique, private `__brand` property to a type, you can ensure that a `UserId` cannot be accidentally used where a `ProductId` is expected, even if both are fundamentally strings. This prevents a common class of logical errors.",
+        "category": "TypeScript",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 242,
+        "question": "## What is the `never` type in TypeScript and when is it used?",
+        "example": "```typescript\n// A function that always throws an error never returns a value.\nfunction throwError(message: string): never {\n  throw new Error(message);\n}\n\n// A function with an infinite loop also has a 'never' return type.\nfunction infiniteLoop(): never {\n  while (true) {}\n}\n```",
+        "solution": "The `never` type represents a value that **never occurs**. It is used in two main scenarios:\n\n1.  As the return type for a function that **always throws an error**.\n2.  As the return type for a function that has an **infinite loop**.\n\nIt is also used in exhaustive checks in `switch` statements to ensure all cases are handled. If a new case is added to a union type, the compiler will throw an error if it's not handled, because the variable would fall into a `never` type.",
+        "category": "TypeScript",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 243,
+        "question": "## What are Decorators in TypeScript?",
+        "example": "```typescript\n// A simple method decorator for logging\nfunction LogMethod(target: any, propertyName: string, descriptor: PropertyDescriptor) {\n  const originalMethod = descriptor.value;\n  descriptor.value = function(...args: any[]) {\n    console.log(`Calling method: ${propertyName}`);\n    return originalMethod.apply(this, args);\n  };\n}\n\nclass Calculator {\n  @LogMethod\n  add(a: number, b: number) {\n    return a + b;\n  }\n}\n```",
+        "solution": "Decorators are a special kind of declaration that can be attached to a class, method, accessor, property, or parameter. They are functions that receive information about the decorated item and can be used to modify or observe it. Decorators are an experimental feature that must be enabled with `\"experimentalDecorators\": true` in `tsconfig.json`. They are heavily used in frameworks like Angular and NestJS for dependency injection, routing, and more.",
+        "category": "TypeScript",
+        "difficulty": "Hard"
+    },
+    {
+        "id": 244,
+        "question": "## What is the purpose of the `satisfies` operator in TypeScript?",
+        "example": "```typescript\ntype RGB = [number, number, number];\n\n// Without 'satisfies', the type of 'palette' is inferred too broadly.\nconst palette = {\n  red: [255, 0, 0],\n  green: \"#00ff00\", // No error here, but we want to enforce the type\n  blue: [0, 0, 255]\n} satisfies Record<string, RGB | string>;\n\n// Now, TypeScript knows 'palette.red' is an array, not 'RGB | string'.\nconst redComponent = palette.red.join(','); // OK\n```",
+        "solution": "The `satisfies` operator (introduced in TS 4.9) allows you to validate that an expression matches a certain type **without changing the inferred type** of that expression. This is useful when you want to ensure an object conforms to a broader type (like a `Record`) but still retain the specific, narrower types of its properties for later use. It helps catch errors early while preserving type inference.",
+        "category": "TypeScript",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 245,
+        "question": "## How can you create a type-safe custom hook in React with TypeScript?",
+        "example": "```tsx\nimport { useState, useEffect } from 'react';\n\n// A generic custom hook for fetching data\nfunction useFetch<T>(url: string): { data: T | null; loading: boolean; error: Error | null } {\n  const [data, setData] = useState<T | null>(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<Error | null>(null);\n\n  useEffect(() => {\n    // ... fetch logic\n  }, [url]);\n\n  return { data, loading, error };\n}\n\n// Usage\nconst { data: user } = useFetch<User>('/api/users/1');\n```",
+        "solution": "To create a type-safe custom hook, you should use **generics**. By defining a generic type parameter (e.g., `<T>`), your hook can work with any data type while maintaining type safety. The hook's return type should be explicitly defined to describe the shape of the object it returns (e.g., `{ data: T | null; loading: boolean; error: Error | null }`). When using the hook, you provide the specific type you expect to receive, which enables full type checking and autocompletion in your component.",
+        "category": "TypeScript",
+        "difficulty": "Medium"
+    }
+]
