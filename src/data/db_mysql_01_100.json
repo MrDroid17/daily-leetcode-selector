@@ -1,0 +1,542 @@
+[
+    {
+        "id": 1,
+        "question": "**What is the difference between SQL and MySQL?** Explain their relationship with practical examples.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Fundamentals",
+        "example": "SQL is a language (like English), MySQL is a database system (like a person who speaks English)",
+        "solution": "**Key Differences:**\n\n**SQL (Structured Query Language):**\n- A standardized language for managing relational databases\n- Defines syntax and rules for database operations\n- Used by all relational database systems\n\n**MySQL:**\n- A specific Relational Database Management System (RDBMS)\n- Implements the SQL standard with its own extensions\n- A software product that stores, manages, and retrieves data\n\n**Relationship:** SQL is the language, MySQL is the database system that speaks that language - like English (language) vs. a specific person who speaks English."
+    },
+    {
+        "id": 2,
+        "question": "**Create a table** named `employees` with appropriate **data types** for employee information including auto-incrementing ID.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "DDL - Data Definition",
+        "example": "CREATE TABLE employees (\n  employee_id INT PRIMARY KEY AUTO_INCREMENT,\n  first_name VARCHAR(50) NOT NULL,\n  last_name VARCHAR(50) NOT NULL,\n  email VARCHAR(100) UNIQUE,\n  hire_date DATE,\n  salary DECIMAL(10, 2)\n);",
+        "solution": "**Key Components Explained:**\n\n- **AUTO_INCREMENT**: Automatically generates unique sequential numbers for the primary key\n- **Data Types**: \n  - `VARCHAR(n)` for variable-length text with maximum size\n  - `DECIMAL(10,2)` for precise currency values (10 total digits, 2 after decimal)\n  - `DATE` for date storage in YYYY-MM-DD format\n- **Constraints**:\n  - `PRIMARY KEY`: Ensures uniqueness and creates automatic index\n  - `NOT NULL`: Prevents empty values in critical fields\n  - `UNIQUE`: Ensures no duplicate emails across all records"
+    },
+    {
+        "id": 3,
+        "question": "**What are the four main categories of SQL commands?** Give examples of each and describe their primary use cases.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Fundamentals",
+        "example": "DDL: CREATE, ALTER, DROP\nDML: SELECT, INSERT, UPDATE, DELETE\nDCL: GRANT, REVOKE\nTCL: COMMIT, ROLLBACK, SAVEPOINT",
+        "solution": "**The Four SQL Command Categories:**\n\n| Category | Purpose | Key Commands | Use Cases |\n|----------|---------|--------------|----------|\n| **DDL** (Data Definition Language) | Defines database structure | CREATE, ALTER, DROP, TRUNCATE | Creating tables, modifying schemas |\n| **DML** (Data Manipulation Language) | Manipulates actual data | SELECT, INSERT, UPDATE, DELETE | Querying and modifying records |\n| **DCL** (Data Control Language) | Manages user permissions | GRANT, REVOKE | Setting user access rights |\n| **TCL** (Transaction Control Language) | Controls transactions | COMMIT, ROLLBACK, SAVEPOINT | Ensuring data consistency |\n\n**Purpose Summary:** Each category serves a specific role in database management, from structure definition to data manipulation and access control."
+    },
+    {
+        "id": 4,
+        "question": "**Add a new column** `is_active` with a **default value** of `true` to an existing `employees` table.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "DDL - ALTER",
+        "example": "ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT true;",
+        "solution": "**ALTER TABLE Statement:**\nModifies the structure of an existing table without losing data.\n\n**Key Features:**\n- **DEFAULT Clause**: Automatically assigns value to new column for existing rows\n- **Data Type**: BOOLEAN stores true/false values (implemented as TINYINT(1))\n- **Non-Destructive**: Existing data remains intact\n\n**Common ALTER Operations:**\n- `ADD COLUMN`: Add new columns\n- `MODIFY COLUMN`: Change data type or constraints\n- `DROP COLUMN`: Remove columns\n- `RENAME COLUMN`: Change column names"
+    },
+    {
+        "id": 5,
+        "question": "**Insert multiple employee records** in a single `INSERT` statement for optimal performance.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "DML - INSERT",
+        "example": "INSERT INTO employees (first_name, last_name, email, salary)\nVALUES\n  ('Alice', 'Williams', 'alice@example.com', 70000.00),\n  ('Bob', 'Johnson', 'bob@example.com', 80000.00),\n  ('Charlie', 'Brown', 'charlie@example.com', 65000.00);",
+        "solution": "**Multi-Row INSERT Benefits:**\n\n**Performance Advantages:**\n- Single transaction for all rows\n- Reduced network round trips\n- Better database optimization\n- Faster execution than multiple single INSERTs\n\n**Syntax Rules:**\n- Values separated by commas\n- Each row in parentheses\n- Column list specified once\n- All rows must match column count"
+    },
+    {
+        "id": 6,
+        "question": "**Write a query** to find all employees in departments `1` or `2` with salary greater than `60000`.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Filtering - WHERE",
+        "example": "SELECT * FROM employees\nWHERE (department_id = 1 OR department_id = 2)\n  AND salary > 60000;",
+        "solution": "**Logical Operators in SQL WHERE Clauses**\n\n**Operator Precedence and Evaluation:**\n\n| Operator | Precedence | Description | Example |\n|----------|------------|-------------|----------|\n| **( )** | Highest | Groups conditions | `(A OR B) AND C` |\n| **NOT** | High | Logical negation | `NOT (salary < 50000)` |\n| **AND** | Medium | Both conditions must be true | `A AND B` |\n| **OR** | Lowest | Either condition can be true | `A OR B` |\n\n**Query Breakdown:**\n```sql\nSELECT * FROM employees\nWHERE (department_id = 1 OR department_id = 2)  -- First: Check dept 1 OR 2\n  AND salary > 60000;                           -- Then: Filter by salary\n```\n\n**Evaluation Process:**\n1. **Step 1**: `(department_id = 1 OR department_id = 2)` - Find employees in departments 1 or 2\n2. **Step 2**: `salary > 60000` - From those employees, keep only high earners\n3. **Result**: Employees in dept 1 or 2 AND earning more than 60000\n\n**Alternative Approaches:**\n```sql\n-- Using IN operator (cleaner syntax)\nSELECT * FROM employees\nWHERE department_id IN (1, 2)\n  AND salary > 60000;\n\n-- Multiple AND conditions\nSELECT * FROM employees\nWHERE (department_id = 1 AND salary > 60000)\n   OR (department_id = 2 AND salary > 60000);\n\n-- Complex logical combinations\nSELECT * FROM employees\nWHERE department_id IN (1, 2, 3)\n  AND (salary > 60000 OR title = 'Manager')\n  AND hire_date >= '2020-01-01';\n```\n\n**Common Mistakes to Avoid:**\n```sql\n-- ❌ Wrong: Without parentheses\nSELECT * FROM employees\nWHERE department_id = 1 OR department_id = 2 AND salary > 60000;\n-- This is interpreted as: dept_id = 1 OR (dept_id = 2 AND salary > 60000)\n\n-- ✅ Correct: With parentheses\nSELECT * FROM employees\nWHERE (department_id = 1 OR department_id = 2) AND salary > 60000;\n```\n\n**Best Practices:**\n- Always use parentheses to make logic explicit\n- Group related conditions together\n- Consider using IN operator for multiple value checks\n- Test complex conditions with sample data to verify logic"
+    },
+    {
+        "id": 7,
+        "question": "**Find all employees** whose first name starts with `'A'` and email **is not null**.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Pattern Matching",
+        "example": "SELECT * FROM employees\nWHERE first_name LIKE 'A%'\n  AND email IS NOT NULL;",
+        "solution": "**Pattern Matching and NULL Handling in SQL**\n\n**LIKE Operator with Wildcards:**\n\n| Wildcard | Function | Example | Matches |\n|----------|----------|---------|----------|\n| **%** | Zero or more characters | `'A%'` | All names starting with 'A' |\n| **_** | Exactly one character | `'A_'` | Two-letter names starting with 'A' |\n| **[abc]** | Any character in brackets | `'[ABC]%'` | Names starting with A, B, or C |\n| **[a-z]** | Character range | `'[a-z]%'` | Names starting with lowercase letters |\n\n**Pattern Examples:**\n```sql\n-- Names starting with 'A'\nWHERE first_name LIKE 'A%'          -- Alice, Andrew, Anna\n\n-- Names ending with 'son'\nWHERE last_name LIKE '%son'         -- Johnson, Wilson, Anderson\n\n-- Names containing 'ann'\nWHERE first_name LIKE '%ann%'       -- Anna, Hannah, Joanna\n\n-- Exactly 4 characters starting with 'J'\nWHERE first_name LIKE 'J___'        -- John, Jake, Jane\n\n-- Second letter is 'a'\nWHERE first_name LIKE '_a%'         -- David, Sarah, Mary\n```\n\n**NULL Value Handling:**\n\n**Why `IS NOT NULL` instead of `!= NULL`:**\n```sql\n-- ❌ Wrong: This will always return no results\nWHERE email != NULL\nWHERE email <> NULL\n\n-- ✅ Correct: Use IS NOT NULL\nWHERE email IS NOT NULL\n\n-- ✅ Also correct: Check for NULL values\nWHERE email IS NULL\n```\n\n**NULL Comparison Rules:**\n- `NULL = NULL` returns `NULL` (not TRUE)\n- `NULL != 'value'` returns `NULL` (not TRUE)\n- Only `IS NULL` and `IS NOT NULL` work with NULL values\n\n**Advanced Pattern Matching:**\n```sql\n-- Case-insensitive search\nWHERE LOWER(first_name) LIKE 'a%'\n\n-- Multiple patterns\nWHERE first_name LIKE 'A%' \n   OR first_name LIKE 'B%'\n   OR first_name LIKE 'C%'\n\n-- Using REGEXP (MySQL)\nWHERE first_name REGEXP '^[ABC]'\n\n-- Combining conditions\nWHERE first_name LIKE 'A%'\n  AND last_name NOT LIKE '%son'\n  AND email IS NOT NULL\n  AND phone IS NOT NULL;\n```\n\n**Performance Considerations:**\n\n| Pattern | Index Usage | Performance |\n|---------|-------------|-------------|\n| `name LIKE 'A%'` | ✅ Can use index | Good |\n| `name LIKE '%son'` | ❌ Cannot use index | Slow |\n| `name LIKE '%ann%'` | ❌ Cannot use index | Slowest |\n| `name LIKE 'A_'` | ✅ Can use index | Good |\n\n**Complete Example with Explanations:**\n```sql\nSELECT \n    employee_id,\n    first_name,\n    last_name,\n    email,\n    hire_date\nFROM employees\nWHERE first_name LIKE 'A%'          -- Pattern: starts with 'A'\n  AND email IS NOT NULL             -- Not null check\n  AND LENGTH(first_name) >= 3       -- Additional condition\nORDER BY first_name;                -- Sort results\n```\n\n**Common Use Cases:**\n- **Search functionality**: User types partial names\n- **Data validation**: Find records with missing email addresses\n- **Data cleaning**: Identify incomplete records\n- **Reporting**: Filter by naming conventions or patterns"
+    },
+    {
+        "id": 8,
+        "question": "**Get the top 3 highest-paid employees**, skipping the first 2 results using pagination.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Sorting and Limiting",
+        "example": "SELECT * FROM employees\nORDER BY salary DESC\nLIMIT 3 OFFSET 2;",
+        "solution": "**SQL Sorting and Pagination Fundamentals**\n\n**ORDER BY Clause:**\n\n| Sort Option | Syntax | Result |\n|-------------|--------|--------|\n| **Ascending** | `ORDER BY column ASC` | Lowest to highest (default) |\n| **Descending** | `ORDER BY column DESC` | Highest to lowest |\n| **Multiple columns** | `ORDER BY col1, col2 DESC` | Primary then secondary sort |\n| **Position** | `ORDER BY 2 DESC` | Sort by 2nd column |\n\n**LIMIT and OFFSET for Pagination:**\n```sql\n-- Get top 3 highest paid employees\nSELECT employee_id, first_name, last_name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3;\n\n-- Skip first 2, get next 3 (employees ranked 3rd, 4th, 5th)\nSELECT employee_id, first_name, last_name, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 3 OFFSET 2;\n```\n\n**Query Execution Breakdown:**\n1. **FROM**: Identify source table (employees)\n2. **ORDER BY**: Sort all records by salary (descending)\n3. **OFFSET**: Skip first 2 records\n4. **LIMIT**: Take next 3 records\n5. **Result**: Employees ranked 3rd, 4th, and 5th by salary\n\n**Pagination Patterns:**\n```sql\n-- Page 1: First 10 records\nSELECT * FROM employees ORDER BY employee_id LIMIT 10 OFFSET 0;\n\n-- Page 2: Records 11-20\nSELECT * FROM employees ORDER BY employee_id LIMIT 10 OFFSET 10;\n\n-- Page 3: Records 21-30\nSELECT * FROM employees ORDER BY employee_id LIMIT 10 OFFSET 20;\n\n-- Generic formula: OFFSET = (page_number - 1) * page_size\n```\n\n**Best Practices:**\n- Always use ORDER BY with LIMIT for consistent results\n- Create indexes on frequently sorted columns\n- Use cursor-based pagination for large datasets\n- Consider memory usage with large result sets"
+    },
+    {
+        "id": 9,
+        "question": "**Find the average salary and count of employees** in each department using aggregation functions.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Aggregation",
+        "example": "SELECT\n  department_id,\n  COUNT(*) AS num_employees,\n  AVG(salary) AS avg_salary\nFROM employees\nGROUP BY department_id;",
+        "solution": "**SQL Aggregation with GROUP BY**\n\n**Aggregation Functions:**\n\n| Function | Purpose | Example | Result |\n|----------|---------|---------|--------|\n| **COUNT(*)** | Count all rows | `COUNT(*)` | Total records |\n| **COUNT(column)** | Count non-NULL values | `COUNT(email)` | Records with email |\n| **AVG()** | Calculate average | `AVG(salary)` | Average salary |\n| **SUM()** | Calculate total | `SUM(amount)` | Total amount |\n| **MIN()** | Find minimum | `MIN(hire_date)` | Earliest hire date |\n| **MAX()** | Find maximum | `MAX(salary)` | Highest salary |\n\n**GROUP BY Mechanics:**\n```sql\n-- Step 1: GROUP BY creates groups\nSELECT department_id FROM employees GROUP BY department_id;\n-- Results in: 1, 2, 3, 4 (unique department IDs)\n\n-- Step 2: Aggregation functions operate on each group\nSELECT \n  department_id,\n  COUNT(*) AS num_employees,     -- Count employees per department\n  AVG(salary) AS avg_salary,     -- Average salary per department\n  MIN(hire_date) AS first_hire,  -- Earliest hire per department\n  MAX(salary) AS highest_salary  -- Highest salary per department\nFROM employees\nGROUP BY department_id;\n```\n\n**Query Execution Process:**\n1. **FROM**: Start with employees table\n2. **GROUP BY**: Organize rows into groups by department_id\n3. **SELECT**: Apply aggregation functions to each group\n4. **Result**: One row per department with calculated values\n\n**Common Patterns:**\n```sql\n-- Multiple grouping columns\nSELECT \n  department_id, \n  job_title,\n  COUNT(*) as employee_count,\n  AVG(salary) as avg_salary\nFROM employees\nGROUP BY department_id, job_title;\n\n-- Filtering before grouping\nSELECT \n  department_id,\n  COUNT(*) as active_employees\nFROM employees\nWHERE is_active = true\nGROUP BY department_id;\n\n-- Ordering grouped results\nSELECT \n  department_id,\n  AVG(salary) as avg_salary\nFROM employees\nGROUP BY department_id\nORDER BY avg_salary DESC;\n```\n\n**Important Rules:**\n- **SELECT clause**: Can only contain GROUP BY columns or aggregation functions\n- **Non-aggregated columns**: Must be included in GROUP BY\n- **WHERE vs HAVING**: WHERE filters before grouping, HAVING filters after"
+    },
+    {
+        "id": 10,
+        "question": "**Show departments** with more than `5` employees and average salary above `70000` using the `HAVING` clause.",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "HAVING Clause",
+        "example": "SELECT\n  department_id,\n  COUNT(*) AS num_employees,\n  AVG(salary) AS avg_salary\nFROM employees\nGROUP BY department_id\nHAVING COUNT(*) > 5 AND AVG(salary) > 70000;",
+        "solution": "**HAVING Clause: Filtering Grouped Data**\n\n**WHERE vs HAVING Comparison:**\n\n| Aspect | WHERE | HAVING |\n|--------|-------|--------|\n| **When Applied** | Before grouping | After grouping |\n| **Filters** | Individual rows | Grouped results |\n| **Can Use** | Column values | Aggregation functions |\n| **Position** | Before GROUP BY | After GROUP BY |\n\n**Query Execution Order:**\n```sql\nSELECT department_id, COUNT(*), AVG(salary)\nFROM employees\nWHERE is_active = true           -- 1. Filter individual rows first\nGROUP BY department_id           -- 2. Group remaining rows\nHAVING COUNT(*) > 5              -- 3. Filter grouped results\n   AND AVG(salary) > 70000       -- 4. Additional group filter\nORDER BY AVG(salary) DESC;       -- 5. Sort final results\n```\n\n**Step-by-Step Process:**\n1. **WHERE**: Remove inactive employees\n2. **GROUP BY**: Create groups by department\n3. **Aggregation**: Calculate COUNT(*) and AVG(salary) for each group\n4. **HAVING**: Keep only groups meeting both conditions\n5. **Result**: Departments with 5+ employees and 70000+ average salary\n\n**HAVING with Different Aggregations:**\n```sql\n-- Filter by count\nSELECT department_id, COUNT(*) as emp_count\nFROM employees\nGROUP BY department_id\nHAVING COUNT(*) BETWEEN 3 AND 10;\n\n-- Filter by sum\nSELECT customer_id, SUM(order_amount) as total_spent\nFROM orders\nGROUP BY customer_id\nHAVING SUM(order_amount) > 10000;\n\n-- Filter by maximum\nSELECT department_id, MAX(salary) as highest_salary\nFROM employees\nGROUP BY department_id\nHAVING MAX(salary) > 100000;\n\n-- Complex conditions\nSELECT \n  department_id,\n  COUNT(*) as emp_count,\n  AVG(salary) as avg_salary\nFROM employees\nGROUP BY department_id\nHAVING COUNT(*) > 5 \n   AND AVG(salary) > 70000\n   AND MIN(hire_date) > '2020-01-01';\n```\n\n**Common Mistakes:**\n```sql\n-- ❌ Wrong: Using aggregation in WHERE\nSELECT department_id\nFROM employees\nWHERE COUNT(*) > 5;  -- ERROR: Can't use aggregation in WHERE\n\n-- ✅ Correct: Using aggregation in HAVING\nSELECT department_id\nFROM employees\nGROUP BY department_id\nHAVING COUNT(*) > 5;\n```\n\n**Practical Applications:**\n- **Business Intelligence**: Find high-performing sales regions\n- **Quality Control**: Identify departments with concerning metrics\n- **Resource Planning**: Locate departments needing attention\n- **Performance Analysis**: Filter results by calculated thresholds"
+    },
+    {
+        "id": 11,
+        "question": "**Write an INNER JOIN** to show employee names with their department names using table aliases.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "INNER JOIN",
+        "example": "SELECT\n  e.first_name,\n  e.last_name,\n  d.department_name\nFROM employees AS e\nINNER JOIN departments AS d\n  ON e.department_id = d.department_id;",
+        "solution": "**INNER JOIN: Matching Records Only**\n\n**INNER JOIN Fundamentals:**\n- Returns only rows where **both tables have matching values**\n- Most restrictive type of JOIN\n- Excludes unmatched rows from both tables\n\n**Query Breakdown:**\n```sql\nSELECT\n  e.first_name,                    -- From employees table\n  e.last_name,                     -- From employees table  \n  d.department_name                -- From departments table\nFROM employees AS e                -- Left table with alias 'e'\nINNER JOIN departments AS d        -- Right table with alias 'd'\n  ON e.department_id = d.department_id;  -- Join condition\n```\n\n**Table Aliases Benefits:**\n\n| Benefit | Example | Advantage |\n|---------|---------|----------|\n| **Shorter syntax** | `e.name` vs `employees.name` | Less typing |\n| **Readability** | Clear table references | Easier to understand |\n| **Required for self-joins** | `e1.manager_id = e2.employee_id` | Distinguish same table |\n| **Performance** | Cleaner execution plan | Optimized queries |\n\n**INNER JOIN Variations:**\n```sql\n-- Multiple JOIN conditions\nSELECT e.first_name, d.department_name\nFROM employees e\nINNER JOIN departments d\n  ON e.department_id = d.department_id\n  AND e.is_active = true\n  AND d.is_active = true;\n\n-- Three-table INNER JOIN\nSELECT \n  e.first_name,\n  d.department_name,\n  l.city\nFROM employees e\nINNER JOIN departments d ON e.department_id = d.department_id\nINNER JOIN locations l ON d.location_id = l.location_id;\n\n-- Self JOIN (employees and their managers)\nSELECT \n  e1.first_name AS employee_name,\n  e2.first_name AS manager_name\nFROM employees e1\nINNER JOIN employees e2 ON e1.manager_id = e2.employee_id;\n```\n\n**When to Use INNER JOIN:**\n- ✅ **Required data exists in both tables**\n- ✅ **Strict data integrity requirements**\n- ✅ **Performance is critical** (fastest JOIN type)\n- ✅ **Clean, complete datasets**\n\n**Results Explanation:**\n- **Included**: Employees with assigned departments\n- **Excluded**: Employees without departments\n- **Excluded**: Departments without employees\n- **Guarantee**: Every result row has complete data from both tables\n\n**Performance Considerations:**\n```sql\n-- ✅ Optimized: Join on indexed columns\nSELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.dept_id = d.id;  -- Both IDs should be indexed\n\n-- ⚠️ Slower: Join on non-indexed columns\nSELECT e.name, d.name\nFROM employees e\nINNER JOIN departments d ON e.dept_name = d.name;  -- String comparison\n```"
+    },
+    {
+        "id": 12,
+        "question": "**Show all employees** including those without a department using `LEFT JOIN`.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "LEFT JOIN",
+        "example": "SELECT\n  e.first_name,\n  e.last_name,\n  d.department_name\nFROM employees AS e\nLEFT JOIN departments AS d\n  ON e.department_id = d.department_id;",
+        "solution": "**LEFT JOIN: All Left Table Records + Matches**\n\n**LEFT JOIN Characteristics:**\n- Returns **ALL rows from left table** (employees)\n- Returns **matching rows from right table** (departments)\n- **NULL values** for unmatched right table columns\n- **Preserves left table completeness**\n\n**Visual Representation:**\n```\nLeft Table (employees)     Right Table (departments)\n┌─────────────────┐       ┌──────────────────┐\n│ ALL EMPLOYEES   │  ←──  │ MATCHING DEPTS   │\n│ (matched +      │       │ (+ NULL for      │\n│  unmatched)     │       │  unmatched)      │\n└─────────────────┘       └──────────────────┘\n```\n\n**Result Analysis:**\n```sql\nSELECT \n  e.first_name,\n  e.last_name,\n  d.department_name    -- May contain NULL\nFROM employees AS e\nLEFT JOIN departments AS d\n  ON e.department_id = d.department_id;\n```\n\n**Sample Results:**\n| first_name | last_name | department_name |\n|------------|-----------|------------------|\n| John       | Doe       | Engineering     |\n| Jane       | Smith     | Marketing       |\n| Bob        | Wilson    | NULL            |\n| Alice      | Johnson   | HR              |\n| Mike       | Brown     | NULL            |\n\n**Practical Applications:**\n\n| Use Case | Purpose | Query Pattern |\n|----------|---------|---------------|\n| **Find orphaned records** | Employees without departments | `WHERE d.id IS NULL` |\n| **Complete employee list** | All employees + dept info | Standard LEFT JOIN |\n| **Data quality check** | Missing relationships | Count NULL departments |\n| **Optional information** | Include dept if available | Display with COALESCE |\n\n**Advanced LEFT JOIN Patterns:**\n```sql\n-- Find employees WITHOUT departments\nSELECT e.first_name, e.last_name\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.department_id\nWHERE d.department_id IS NULL;\n\n-- Handle NULL values with COALESCE\nSELECT \n  e.first_name,\n  COALESCE(d.department_name, 'Unassigned') as department\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.department_id;\n\n-- Count employees by department (including unassigned)\nSELECT \n  COALESCE(d.department_name, 'Unassigned') as department,\n  COUNT(e.employee_id) as employee_count\nFROM employees e\nLEFT JOIN departments d ON e.department_id = d.department_id\nGROUP BY d.department_name;\n```\n\n**Performance Tips:**\n- Index the join columns in both tables\n- Place more selective table on the left when possible\n- Use WHERE clauses to filter before joining\n- Consider query execution plan with EXPLAIN"
+    },
+    {
+        "id": 13,
+        "question": "**Show all departments** including those with no employees using `RIGHT JOIN`.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "RIGHT JOIN",
+        "example": "SELECT\n  e.first_name,\n  e.last_name,\n  d.department_name\nFROM employees AS e\nRIGHT JOIN departments AS d\n  ON e.department_id = d.department_id;",
+        "solution": "RIGHT JOIN includes all rows from the right table (departments), even if no employees are assigned to them."
+    },
+    {
+        "id": 14,
+        "question": "Explain when to use INNER JOIN vs LEFT JOIN vs RIGHT JOIN.",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "JOIN Types",
+        "example": "INNER JOIN: Only matching records from both tables\nLEFT JOIN: All records from left table + matches from right\nRIGHT JOIN: All records from right table + matches from left",
+        "solution": "**JOIN Types Comparison:**\n\n| JOIN Type | Left Table Records | Right Table Records | Use Case |\n|-----------|-------------------|--------------------|-----------|\n| **INNER JOIN** | Only matched | Only matched | When you need data that exists in both tables |\n| **LEFT JOIN** | All records | Only matched | When you need all records from left table |\n| **RIGHT JOIN** | Only matched | All records | When you need all records from right table |\n\n**Decision Guidelines:**\n- **INNER JOIN**: Use when both tables must have matching data\n- **LEFT JOIN**: Use when the left table is your primary dataset\n- **RIGHT JOIN**: Use when the right table is your primary dataset (less common)\n\n**Example Scenarios:**\n- Employees + Departments (INNER): Only employees with assigned departments\n- Employees + Departments (LEFT): All employees, even unassigned ones"
+    },
+    {
+        "id": 15,
+        "question": "How do you create an index on the `last_name` column? What are the pros and cons for query performance?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Indexing",
+        "example": "CREATE INDEX idx_last_name ON employees (last_name);",
+        "solution": "An index on `last_name` speeds up searches and sorts, but adds overhead for writes.\n\n**Code Example:**\n```sql\nCREATE INDEX idx_last_name ON employees (last_name);\n```\n**Explanation:**\n- This creates a B-tree index for fast lookups on `last_name`.\n- **Pros:**\n  - Faster SELECT, ORDER BY, and JOIN queries on `last_name`.\n  - Reduces table scan time, especially for large tables.\n- **Cons:**\n  - Slower INSERT, UPDATE, DELETE operations (index must be updated).\n  - Uses extra disk space.\n  - Too many indexes can hurt write performance.\n- Use indexes on columns frequently filtered or sorted, but avoid on columns with many duplicate values or frequent changes."
+    },
+    {
+        "id": 16,
+        "question": "How do you create a composite index on `department_id` and `salary`? Why does column order matter?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Composite Indexing",
+        "example": "CREATE INDEX idx_dept_salary ON employees (department_id, salary);",
+        "solution": "A composite index speeds up queries filtering by both columns. Column order affects which queries use the index.\n\n**Code Example:**\n```sql\nCREATE INDEX idx_dept_salary ON employees (department_id, salary);\n```\n**Explanation:**\n- This index helps queries like `WHERE department_id = 1 AND salary > 50000`.\n- The index is most effective when filtering by the leftmost column (`department_id`).\n- Queries using only `salary` won't use this index efficiently.\n- Use composite indexes for multi-column filters and order columns by query patterns (equality first, then range)."
+    },
+    {
+        "id": 17,
+        "question": "How do you transfer money between two accounts using a transaction?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Transactions",
+        "example": "START TRANSACTION;\nUPDATE accounts SET balance = balance - 100 WHERE account_id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE account_id = 2;\nCOMMIT;",
+        "solution": "Use transactions to ensure atomic updates—both account balances change together or not at all.\n\n**Code Example:**\n```sql\nSTART TRANSACTION;\nUPDATE accounts SET balance = balance - 100 WHERE account_id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE account_id = 2;\nCOMMIT;\n-- If error occurs, use ROLLBACK;\n```\n**Explanation:**\n- `START TRANSACTION` begins a block of statements.\n- Both `UPDATE` statements run as a unit.\n- `COMMIT` saves changes if all succeed; `ROLLBACK` undoes if any fail.\n- Ensures ACID properties: atomicity, consistency, isolation, durability."
+    },
+    {
+        "id": 18,
+        "question": "How do you use EXPLAIN to analyze a query's execution plan?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Query Optimization",
+        "example": "EXPLAIN SELECT * FROM employees WHERE department_id = 1;",
+        "solution": "EXPLAIN shows how the database will execute your query, including index usage and row estimates.\n\n**Code Example:**\n```sql\nEXPLAIN SELECT * FROM employees WHERE department_id = 1;\n```\n**Explanation:**\n- Returns details like access type (`ALL`, `index`, `range`), index used, and estimated rows.\n- Look for `type = ALL` (full table scan) vs. `type = ref/range` (index usage).\n- Use EXPLAIN to optimize queries by adding indexes or rewriting conditions."
+    },
+    {
+        "id": 19,
+        "question": "What causes a full table scan and how can you avoid it?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Performance Optimization",
+        "example": "SELECT * FROM employees WHERE first_name = 'John';",
+        "solution": "Full table scans happen when no suitable index exists or functions prevent index use. Avoid by indexing filter columns and rewriting queries.\n\n**Code Example:**\n```sql\n-- BAD: No index\nSELECT * FROM employees WHERE first_name = 'John';\n-- GOOD: Create index\nCREATE INDEX idx_first_name ON employees (first_name);\nSELECT * FROM employees WHERE first_name = 'John';\n```\n**Explanation:**\n- Without an index, the database checks every row.\n- Functions on columns (e.g., `UPPER(name)`) or type mismatches also cause scans.\n- Always index columns used in WHERE, JOIN, ORDER BY, and avoid functions on indexed columns."
+    },
+    {
+        "id": 20,
+        "question": "How do you write a query that avoids functions on indexed columns for better performance?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Query Optimization",
+        "example": "SELECT * FROM employees WHERE YEAR(hire_date) = 2023;",
+        "solution": "Rewrite queries to use range conditions instead of functions on indexed columns, so indexes are used efficiently.\n\n**Code Example:**\n```sql\n-- BAD: Function prevents index usage\nSELECT * FROM employees WHERE YEAR(hire_date) = 2023;\n-- GOOD: Range query uses index\nSELECT * FROM employees WHERE hire_date >= '2023-01-01' AND hire_date < '2024-01-01';\n```\n**Explanation:**\n- Functions like `YEAR(hire_date)` force the database to process every row.\n- Range queries allow the index to quickly find matching rows.\n- For strings, use direct comparisons or create functional indexes if needed."
+    },
+    {
+        "id": 21,
+        "question": "How do you find all products from the 'Classic Cars' product line using a JOIN?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Business Query - Product Catalog",
+        "example": "SELECT productName FROM products p INNER JOIN productlines pl ON p.productLine = pl.productLine WHERE pl.productLine = 'Classic Cars';",
+        "solution": "Use an INNER JOIN to link products to product lines and filter by the desired category.\n\n**Code Example:**\n```sql\nSELECT productName, productVendor, MSRP\nFROM products p\nINNER JOIN productlines pl ON p.productLine = pl.productLine\nWHERE pl.productLine = 'Classic Cars';\n```\n**Explanation:**\n- `INNER JOIN` connects products to their product line.\n- The WHERE clause filters for 'Classic Cars'.\n- Returns only products in that category, with details from both tables."
+    },
+    {
+        "id": 22,
+        "question": "How do you find the sales representative for a specific customer using a JOIN?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Business Query - Customer Relations",
+        "example": "SELECT c.customerName, e.firstName, e.lastName FROM customers c INNER JOIN employees e ON c.salesRepEmployeeNumber = e.employeeNumber WHERE c.customerName = 'Atelier graphique';",
+        "solution": "Join customers to employees using the sales rep foreign key to get the assigned representative.\n\n**Code Example:**\n```sql\nSELECT c.customerName, e.firstName AS salesRepFirstName, e.lastName AS salesRepLastName, e.email AS salesRepEmail\nFROM customers c\nINNER JOIN employees e ON c.salesRepEmployeeNumber = e.employeeNumber\nWHERE c.customerName = 'Atelier graphique';\n```\n**Explanation:**\n- `INNER JOIN` links each customer to their sales rep.\n- Filters for a specific customer.\n- Returns customer and sales rep details."
+    },
+    {
+        "id": 23,
+        "question": "How do you calculate the total payment received from each customer, ordered by highest amount?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Business Query - Financial Analysis",
+        "example": "SELECT c.customerName, SUM(p.amount) AS totalPayments FROM customers c INNER JOIN payments p ON c.customerNumber = p.customerNumber GROUP BY c.customerNumber, c.customerName ORDER BY totalPayments DESC;",
+        "solution": "Aggregate payments per customer using SUM and GROUP BY, then order by total amount.\n\n**Code Example:**\n```sql\nSELECT c.customerName, SUM(p.amount) AS totalPayments\nFROM customers c\nINNER JOIN payments p ON c.customerNumber = p.customerNumber\nGROUP BY c.customerNumber, c.customerName\nORDER BY totalPayments DESC;\n```\n**Explanation:**\n- `SUM(p.amount)` totals payments for each customer.\n- `GROUP BY` groups results by customer.\n- `ORDER BY totalPayments DESC` ranks customers by payment amount."
+    },
+    {
+        "id": 24,
+        "question": "How do you find the top 5 best-selling products by total quantity sold?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Business Query - Sales Analysis",
+        "example": "SELECT p.productName, SUM(od.quantityOrdered) AS totalQuantitySold FROM products p INNER JOIN orderdetails od ON p.productCode = od.productCode GROUP BY p.productCode, p.productName ORDER BY totalQuantitySold DESC LIMIT 5;",
+        "solution": "Join products to order details, sum quantities, group by product, and limit to top 5.\n\n**Code Example:**\n```sql\nSELECT p.productName, SUM(od.quantityOrdered) AS totalQuantitySold\nFROM products p\nINNER JOIN orderdetails od ON p.productCode = od.productCode\nGROUP BY p.productCode, p.productName\nORDER BY totalQuantitySold DESC\nLIMIT 5;\n```\n**Explanation:**\n- `SUM(od.quantityOrdered)` totals sales per product.\n- `GROUP BY` groups by product.\n- `ORDER BY ... DESC LIMIT 5` gets the top 5 sellers."
+    },
+    {
+        "id": 25,
+        "question": "How do you find customers who have never placed any orders using LEFT JOIN?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Business Query - Customer Analysis",
+        "example": "SELECT c.customerNumber, c.customerName, c.phone FROM customers c LEFT JOIN orders o ON c.customerNumber = o.customerNumber WHERE o.orderNumber IS NULL;",
+        "solution": "Use LEFT JOIN to include all customers and filter for those with no matching orders (NULL orderNumber).\n\n**Code Example:**\n```sql\nSELECT c.customerNumber, c.customerName, c.phone\nFROM customers c\nLEFT JOIN orders o ON c.customerNumber = o.customerNumber\nWHERE o.orderNumber IS NULL;\n```\n**Explanation:**\n- LEFT JOIN returns all customers, even those without orders.\n- WHERE o.orderNumber IS NULL filters for customers with no orders.\n- Useful for identifying prospects or inactive customers."
+    },
+    {
+        "id": 26,
+        "question": "How do you calculate the total sale amount for each order?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Business Query - Order Analysis",
+        "example": "SELECT orderNumber, SUM(quantityOrdered * priceEach) AS orderTotal FROM orderdetails GROUP BY orderNumber ORDER BY orderTotal DESC;",
+        "solution": "Aggregate line item values per order using SUM and GROUP BY for revenue analysis.\n\n**Code Example:**\n```sql\nSELECT orderNumber, SUM(quantityOrdered * priceEach) AS orderTotal\nFROM orderdetails\nGROUP BY orderNumber\nORDER BY orderTotal DESC;\n```\n**Explanation:**\n- Multiplies quantity by price for each line item.\n- Sums these per order.\n- Orders results by highest total sale."
+    },
+    {
+        "id": 27,
+        "question": "How do you find customers with individual payments above the average payment amount using a subquery?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Subqueries",
+        "example": "SELECT c.customerName, p.amount FROM customers c INNER JOIN payments p ON c.customerNumber = p.customerNumber WHERE p.amount > (SELECT AVG(amount) FROM payments);",
+        "solution": "Use a subquery to calculate the average payment, then filter for payments above that value.\n\n**Code Example:**\n```sql\nSELECT c.customerName, p.amount\nFROM customers c\nINNER JOIN payments p ON c.customerNumber = p.customerNumber\nWHERE p.amount > (SELECT AVG(amount) FROM payments);\n```\n**Explanation:**\n- The subquery `(SELECT AVG(amount) FROM payments)` computes the average.\n- The WHERE clause filters for payments greater than this average.\n- Returns customers and their above-average payments."
+    },
+    {
+        "id": 28,
+        "question": "How do you find the employee who manages the most customers using a CTE?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Common Table Expressions",
+        "example": "WITH SalesRepCustomerCounts AS (SELECT salesRepEmployeeNumber, COUNT(*) AS customerCount FROM customers WHERE salesRepEmployeeNumber IS NOT NULL GROUP BY salesRepEmployeeNumber) SELECT e.firstName, e.lastName, s.customerCount FROM employees e INNER JOIN SalesRepCustomerCounts s ON e.employeeNumber = s.salesRepEmployeeNumber ORDER BY s.customerCount DESC LIMIT 1;",
+        "solution": "Use a CTE to count customers per sales rep, then join to employees and select the top result.\n\n**Code Example:**\n```sql\nWITH SalesRepCustomerCounts AS (\n  SELECT salesRepEmployeeNumber, COUNT(*) AS customerCount\n  FROM customers\n  WHERE salesRepEmployeeNumber IS NOT NULL\n  GROUP BY salesRepEmployeeNumber\n)\nSELECT e.firstName, e.lastName, s.customerCount\nFROM employees e\nINNER JOIN SalesRepCustomerCounts s ON e.employeeNumber = s.salesRepEmployeeNumber\nORDER BY s.customerCount DESC\nLIMIT 1;\n```\n**Explanation:**\n- The CTE calculates customer counts per sales rep.\n- Join to employees for names.\n- Order by count and limit to the top manager."
+    },
+    {
+        "id": 29,
+        "question": "How do you optimize a query that uses functions on indexed columns?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Performance Optimization",
+        "example": "SELECT * FROM orders WHERE YEAR(orderDate) = 2023;",
+        "solution": "Rewrite queries to use index-friendly conditions, such as ranges, or create functional indexes if needed.\n\n**Code Example:**\n```sql\n-- BAD: Function prevents index usage\nSELECT * FROM orders WHERE YEAR(orderDate) = 2023;\n-- GOOD: Range condition uses index\nSELECT * FROM orders WHERE orderDate >= '2023-01-01' AND orderDate < '2024-01-01';\n```\n**Explanation:**\n- Functions on columns block index usage and cause table scans.\n- Range conditions allow the database to use indexes efficiently.\n- For unavoidable functions, consider functional or computed column indexes."
+    },
+    {
+        "id": 30,
+        "question": "How do you create a covering index and what are its benefits?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Advanced Indexing",
+        "example": "CREATE INDEX idx_dept_covering ON employees (department_id, first_name, last_name, email);",
+        "solution": "A covering index includes all columns needed by a query, eliminating extra table lookups and improving performance.\n\n**Code Example:**\n```sql\nCREATE INDEX idx_dept_covering ON employees (department_id, first_name, last_name, email);\nSELECT first_name, last_name, email FROM employees WHERE department_id = 1;\n```\n**Explanation:**\n- The index covers all columns used in WHERE and SELECT.\n- The query is satisfied entirely from the index, avoiding extra reads from the table.\n- Covering indexes are ideal for frequent, read-heavy queries but increase index size and maintenance cost."
+    },
+    {
+        "id": 31,
+        "question": "Compare ACID compliance and data integrity features in PostgreSQL vs MySQL.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Database Comparison",
+        "example": "PostgreSQL: Full ACID compliance by design\nMySQL: ACID compliance varies by storage engine (InnoDB: Yes, MyISAM: No)",
+        "solution": "PostgreSQL is always ACID compliant, enforcing strict data integrity. MySQL is ACID compliant only with InnoDB; MyISAM lacks transactions and foreign keys.\n\n**Code Example:**\n```sql\n-- PostgreSQL: All tables support transactions and constraints\n-- MySQL: Use InnoDB for ACID\nCREATE TABLE ... ENGINE=InnoDB;\n```\n**Explanation:**\n- PostgreSQL guarantees atomicity, consistency, isolation, durability for all operations.\n- MySQL requires InnoDB for full ACID; MyISAM is faster but not safe for critical data."
+    },
+    {
+        "id": 32,
+        "question": "What advanced data types does PostgreSQL support that MySQL does not?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Data Types",
+        "example": "PostgreSQL: ARRAY[], JSONB, POINT, POLYGON, INET, MACADDR, UUID, ENUM\nMySQL: Limited to JSON, basic spatial types, no native arrays or network types",
+        "solution": "PostgreSQL supports arrays, JSONB, geometric, network, range, UUID, and custom types, enabling complex data modeling and efficient queries.\n\n**Code Example:**\n```sql\n-- Array type\nCREATE TABLE posts (tags TEXT[]);\n-- JSONB type\nCREATE TABLE profiles (data JSONB);\n-- Geometric type\nCREATE TABLE locations (center POINT);\n-- Network type\nCREATE TABLE devices (ip INET);\n-- Range type\nCREATE TABLE bookings (stay_period DATERANGE);\n-- UUID type\nCREATE TABLE users (id UUID PRIMARY KEY);\n```\n**Explanation:**\n- Arrays allow multi-value fields without extra tables.\n- JSONB supports indexed, binary JSON queries.\n- Geometric and network types enable GIS and networking applications.\n- Range and UUID types simplify complex logic and ensure uniqueness.\n- MySQL lacks most of these, requiring workarounds."
+    },
+    {
+        "id": 33,
+        "question": "How do you use PostgreSQL array data types to store and query tag collections?",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "PostgreSQL Arrays",
+        "example": "CREATE TABLE posts (id SERIAL PRIMARY KEY, title TEXT, tags TEXT[]);\nINSERT INTO posts (title, tags) VALUES ('Database Tutorial', ARRAY['sql', 'database', 'tutorial']);\nSELECT * FROM posts WHERE 'sql' = ANY(tags);",
+        "solution": "Arrays in PostgreSQL let you store multiple tags in one column and query them efficiently using array operators and GIN indexes.\n\n**Code Example:**\n```sql\nCREATE TABLE posts (id SERIAL PRIMARY KEY, title TEXT, tags TEXT[]);\nINSERT INTO posts (title, tags) VALUES ('Database Tutorial', ARRAY['sql', 'database', 'tutorial']);\nSELECT * FROM posts WHERE 'sql' = ANY(tags);\nCREATE INDEX idx_posts_tags_gin ON posts USING gin (tags);\n```\n**Explanation:**\n- Arrays store tag lists directly in the row.\n- `'sql' = ANY(tags)` finds posts with a specific tag.\n- GIN index speeds up array searches.\n- Arrays reduce join complexity and improve performance for tag queries."
+    },
+    {
+        "id": 34,
+        "question": "Compare indexing capabilities and advanced index types in PostgreSQL vs MySQL.",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Indexing Comparison",
+        "example": "PostgreSQL: B-tree, GiST, GIN, SP-GiST, BRIN, Hash, partial indexes, expression indexes\nMySQL: B-tree, Hash, full-text, spatial indexes (limited)",
+        "solution": "PostgreSQL offers B-tree, Hash, GIN, GiST, SP-GiST, BRIN, partial, and expression indexes for advanced queries. MySQL supports B-tree, Hash (limited), full-text, and basic spatial indexes.\n\n**Code Example:**\n```sql\n-- PostgreSQL advanced indexes\nCREATE INDEX idx_tags_gin ON posts USING gin (tags);\nCREATE INDEX idx_area_gist ON locations USING gist (area);\nCREATE INDEX idx_active_email ON users (email) WHERE active = true;\nCREATE INDEX idx_lower_email ON users (lower(email));\n-- MySQL basic indexes\nCREATE INDEX idx_email ON users (email);\nCREATE FULLTEXT INDEX idx_content ON articles (content);\n```\n**Explanation:**\n- PostgreSQL supports partial and function-based indexes for targeted optimization.\n- GIN and GiST enable fast searches on arrays, JSONB, and geometric data.\n- MySQL lacks partial and expression indexes, limiting advanced query performance."
+    },
+    {
+        "id": 35,
+        "question": "How do you create a partial index in PostgreSQL for active users?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "PostgreSQL Indexing",
+        "example": "CREATE INDEX idx_active_users_email ON users (email) WHERE active = true;",
+        "solution": "Partial indexes include only rows meeting a condition, reducing index size and improving performance for filtered queries.\n\n**Code Example:**\n```sql\nCREATE INDEX idx_active_users_email ON users (email) WHERE active = true;\n```\n**Explanation:**\n- Only active users are indexed.\n- Queries filtering for active users use a smaller, faster index.\n- Useful for tables with many inactive or irrelevant rows."
+    },
+    {
+        "id": 36,
+        "question": "How does window function support differ between PostgreSQL and MySQL?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Window Functions",
+        "example": "PostgreSQL: Comprehensive window functions including PERCENTILE_CONT, advanced framing\nMySQL 8.0+: Basic window functions, more limited features",
+        "solution": "PostgreSQL supports advanced window functions (ranking, percentiles, custom frames). MySQL 8.0+ added basic window functions but lacks some advanced features.\n\n**Code Example:**\n```sql\n-- PostgreSQL advanced window function\nSELECT customerName, RANK() OVER (ORDER BY totalPayments DESC) FROM customers;\n-- MySQL basic window function\nSELECT customerName, ROW_NUMBER() OVER (ORDER BY totalPayments DESC) FROM customers;\n```\n**Explanation:**\n- PostgreSQL offers more statistical and analytic functions.\n- MySQL covers basic ranking and aggregation but not all advanced options."
+    },
+    {
+        "id": 37,
+        "question": "When should you choose PostgreSQL over MySQL?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Database Selection",
+        "example": "Choose PostgreSQL for:\n- Complex analytical applications\n- Data warehousing and reporting\n- Strict data integrity requirements\n- Geographic/spatial applications\n- Full-text search requirements",
+        "solution": "Choose PostgreSQL for complex analytics, strict compliance, advanced data types, extensibility, and enterprise features.\n\n**Code Example:**\n```sql\n-- PostgreSQL supports advanced types and analytics\nCREATE TABLE data (info JSONB, tags TEXT[], location POINT);\n```\n**Explanation:**\n- PostgreSQL excels in scenarios needing custom types, analytics, and reliability."
+    },
+    {
+        "id": 38,
+        "question": "When should you choose MySQL over PostgreSQL?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Database Selection",
+        "example": "Choose MySQL for:\n- Web applications and CMS\n- E-commerce platforms\n- High-volume simple transactions\n- Read-heavy applications\n- Rapid prototyping",
+        "solution": "Choose MySQL for web apps, e-commerce, simple transactions, fast reads, and easy setup.\n\n**Code Example:**\n```sql\n-- MySQL is optimized for simple, high-volume workloads\nCREATE TABLE orders (id INT AUTO_INCREMENT PRIMARY KEY, amount DECIMAL(10,2));\n```\n**Explanation:**\n- MySQL is ideal for straightforward, high-throughput applications."
+    },
+    {
+        "id": 39,
+        "question": "What is a stored procedure and what are its main advantages?",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Stored Procedures",
+        "example": "A stored procedure is a pre-compiled set of SQL statements stored in the database.",
+        "solution": "A stored procedure is a reusable, pre-compiled set of SQL statements stored in the database for performance and security.\n\n**Code Example:**\n```sql\nDELIMITER //\nCREATE PROCEDURE GetAllProducts()\nBEGIN\n  SELECT * FROM products;\nEND //\nDELIMITER ;\n```\n**Explanation:**\n- Procedures run faster due to pre-compilation.\n- Reduce network traffic (single call).\n- Centralize business logic and improve security by controlling access."
+    },
+    {
+        "id": 40,
+        "question": "How do you create a simple stored procedure in MySQL to get all products?",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Stored Procedures - Basic",
+        "example": "DELIMITER //\nCREATE PROCEDURE GetAllProducts()\nBEGIN\n  SELECT * FROM products;\nEND //\nDELIMITER ;",
+        "solution": "Use DELIMITER to define a procedure with multiple statements, then call it to fetch products.\n\n**Code Example:**\n```sql\nDELIMITER //\nCREATE PROCEDURE GetAllProducts()\nBEGIN\n  SELECT * FROM products;\nEND //\nDELIMITER ;\nCALL GetAllProducts();\n```\n**Explanation:**\n- DELIMITER changes statement terminator so semicolons can be used inside the procedure.\n- The procedure can be called repeatedly for consistent results."
+    },
+    {
+        "id": 41,
+        "question": "Create a stored procedure with an IN parameter to find employees by office code.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Stored Procedures - Parameters",
+        "example": "DELIMITER //\nCREATE PROCEDURE GetEmployeesByOffice(IN officeCodeParam VARCHAR(10))\nBEGIN\n  SELECT firstName, lastName, jobTitle\n  FROM employees\n  WHERE officeCode = officeCodeParam;\nEND //\nDELIMITER ;\n\n-- Call with parameter\nCALL GetEmployeesByOffice('1');",
+        "solution": "**Stored Procedure with IN Parameter (MySQL)**\n\nAn `IN` parameter allows you to pass a value into a stored procedure, which can be used to filter or modify the query logic inside the procedure.\n\n**Code Example:**\n```sql\nDELIMITER //\nCREATE PROCEDURE GetEmployeesByOffice(IN officeCodeParam VARCHAR(10))\nBEGIN\n  SELECT firstName, lastName, jobTitle\n  FROM employees\n  WHERE officeCode = officeCodeParam;\nEND //\nDELIMITER ;\n\n-- Usage:\nCALL GetEmployeesByOffice('1');\n```\n\n**Explanation:**\n- `IN officeCodeParam VARCHAR(10)`: Declares an input parameter.\n- The procedure uses this parameter in the `WHERE` clause to filter employees by office code.\n- You call the procedure and pass the desired office code as an argument.\n\n**Benefits:**\n- Dynamic filtering based on input.\n- Reusable logic for different office codes."
+    },
+    {
+        "id": 42,
+        "question": "Create a stored procedure with an OUT parameter to count orders for a customer.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Stored Procedures - OUT Parameters",
+        "example": "DELIMITER //\nCREATE PROCEDURE CountOrdersForCustomer(IN customerNum INT, OUT orderCount INT)\nBEGIN\n  SELECT COUNT(*) INTO orderCount\n  FROM orders\n  WHERE customerNumber = customerNum;\nEND //\nDELIMITER ;\n\n-- Call and get result\nCALL CountOrdersForCustomer(141, @total_orders);\nSELECT @total_orders;",
+        "solution": "**Stored Procedure with OUT Parameter (MySQL)**\n\nAn `OUT` parameter lets a procedure return a value to the caller, such as a count or calculation result.\n\n**Code Example:**\n```sql\nDELIMITER //\nCREATE PROCEDURE CountOrdersForCustomer(IN customerNum INT, OUT orderCount INT)\nBEGIN\n  SELECT COUNT(*) INTO orderCount\n  FROM orders\n  WHERE customerNumber = customerNum;\nEND //\nDELIMITER ;\n\n-- Usage:\nCALL CountOrdersForCustomer(141, @total_orders);\nSELECT @total_orders;\n```\n\n**Explanation:**\n- `IN customerNum INT`: Input parameter for customer number.\n- `OUT orderCount INT`: Output parameter to hold the result.\n- `SELECT COUNT(*) INTO orderCount`: Assigns the count to the output parameter.\n- After calling, use `SELECT @total_orders;` to get the result.\n\n**Benefits:**\n- Procedures can return computed values directly to the caller."
+    },
+    {
+        "id": 43,
+        "question": "How do you view and manage existing stored procedures in MySQL?",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Stored Procedures - Management",
+        "example": "-- Show procedure definition\nSHOW CREATE PROCEDURE GetAllProducts;\n\n-- List all procedures\nSHOW PROCEDURE STATUS WHERE Db = 'classicmodels';\n\n-- Delete a procedure\nDROP PROCEDURE GetAllProducts;",
+        "solution": "**Managing Stored Procedures in MySQL**\n\nYou can view, list, and delete stored procedures using built-in MySQL commands.\n\n**Code Example:**\n```sql\n-- View procedure definition\nSHOW CREATE PROCEDURE GetAllProducts;\n\n-- List all procedures in a database\nSHOW PROCEDURE STATUS WHERE Db = 'classicmodels';\n\n-- Delete a procedure\nDROP PROCEDURE GetAllProducts;\n```\n\n**Explanation:**\n- `SHOW CREATE PROCEDURE`: Displays the SQL code for a procedure.\n- `SHOW PROCEDURE STATUS`: Lists all procedures in the specified database.\n- `DROP PROCEDURE`: Removes a procedure from the database.\n\n**Benefits:**\n- Easy management and maintenance of stored procedures."
+    },
+    {
+        "id": 44,
+        "question": "Where are stored procedures stored and how are they deployed?",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Stored Procedures - Deployment",
+        "example": "Storage: Procedures are stored in the database schema (information_schema.routines)\nDeployment: Execute CREATE PROCEDURE scripts on target servers, preferably using database migration tools like Flyway or Liquibase",
+        "solution": "**Stored Procedure Storage and Deployment**\n\nStored procedures are compiled and stored in the database schema metadata. Deployment is done by executing the procedure creation scripts on the target database.\n\n**Code Example:**\n```sql\n-- Procedures are stored in metadata tables\nSELECT * FROM information_schema.routines WHERE routine_type = 'PROCEDURE';\n\n-- Deploy by running CREATE PROCEDURE scripts\nCREATE PROCEDURE ...\n\n-- Use migration tools for automation\n-- Example: Flyway, Liquibase\n```\n\n**Explanation:**\n- Procedures are part of the database schema and can be queried from `information_schema.routines`.\n- Deployment involves running the `CREATE PROCEDURE` SQL on the target server.\n- Use migration tools for version control and repeatable deployments."
+    },
+    {
+        "id": 45,
+        "question": "Write a query to fetch contactFirstName in uppercase with alias CUSTOMER_NAME.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "String Functions",
+        "example": "SELECT UPPER(contactFirstName) AS CUSTOMER_NAME FROM customers;",
+        "solution": "**Uppercase Conversion with Alias**\n\nUse the `UPPER()` function to convert text to uppercase and `AS` to assign an alias to the result column.\n\n**Code Example:**\n```sql\nSELECT UPPER(contactFirstName) AS CUSTOMER_NAME\nFROM customers;\n```\n\n**Explanation:**\n- `UPPER(contactFirstName)`: Converts the first name to uppercase.\n- `AS CUSTOMER_NAME`: Renames the output column for clarity."
+    },
+    {
+        "id": 46,
+        "question": "Write a query to get the first 3 characters of customerName.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "String Functions",
+        "example": "SELECT SUBSTRING(customerName, 1, 3) FROM customers;",
+        "solution": "**Extracting Substrings in SQL**\n\nUse the `SUBSTRING()` function to get a portion of a string starting at a specified position for a specified length.\n\n**Code Example:**\n```sql\nSELECT SUBSTRING(customerName, 1, 3)\nFROM customers;\n```\n\n**Explanation:**\n- `SUBSTRING(customerName, 1, 3)`: Gets the first three characters of each customer name."
+    },
+    {
+        "id": 47,
+        "question": "Find the position of letter 'a' in customerName for 'Atelier graphique'.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "String Functions",
+        "example": "SELECT INSTR(LOWER(customerName), 'a') \nFROM customers \nWHERE customerName = 'Atelier graphique';",
+        "solution": "**Finding Substring Position in SQL**\n\nUse the `INSTR()` function to find the position of a substring within a string. Use `LOWER()` for case-insensitive search.\n\n**Code Example:**\n```sql\nSELECT INSTR(LOWER(customerName), 'a') AS position\nFROM customers\nWHERE customerName = 'Atelier graphique';\n```\n\n**Explanation:**\n- `LOWER(customerName)`: Converts the name to lowercase.\n- `INSTR(..., 'a')`: Finds the first occurrence of 'a'. Returns 0 if not found."
+    },
+    {
+        "id": 48,
+        "question": "Replace all occurrences of 'a' with '@' in customerName.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "String Functions",
+        "example": "SELECT REPLACE(customerName, 'a', '@') FROM customers;",
+        "solution": "**Replacing Substrings in SQL**\n\nUse the `REPLACE()` function to substitute all occurrences of a substring with another substring.\n\n**Code Example:**\n```sql\nSELECT REPLACE(customerName, 'a', '@') AS updatedName\nFROM customers;\n```\n\n**Explanation:**\n- `REPLACE(customerName, 'a', '@')`: Replaces every 'a' with '@' in the customer name."
+    },
+    {
+        "id": 49,
+        "question": "Concatenate contactFirstName and contactLastName into CONTACT_FULL_NAME.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "String Functions",
+        "example": "SELECT CONCAT(contactFirstName, ' ', contactLastName) AS CONTACT_FULL_NAME FROM customers;",
+        "solution": "**String Concatenation in SQL**\n\nUse the `CONCAT()` function to combine multiple strings into one, adding spaces or other separators as needed.\n\n**Code Example:**\n```sql\nSELECT CONCAT(contactFirstName, ' ', contactLastName) AS CONTACT_FULL_NAME\nFROM customers;\n```\n\n**Explanation:**\n- `CONCAT(contactFirstName, ' ', contactLastName)`: Joins first and last names with a space."
+    },
+    {
+        "id": 50,
+        "question": "Find customers whose contactFirstName ends with 'a'.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Pattern Matching",
+        "example": "SELECT * FROM customers WHERE contactFirstName LIKE '%a';",
+        "solution": "**Pattern Matching with LIKE**\n\nUse the `LIKE` operator and `%` wildcard to match any sequence of characters ending with 'a'.\n\n**Code Example:**\n```sql\nSELECT *\nFROM customers\nWHERE contactFirstName LIKE '%a';\n```\n\n**Explanation:**\n- `%a`: Matches any string that ends with 'a'."
+    },
+    {
+        "id": 51,
+        "question": "Find customers whose contactFirstName is exactly 5 characters and ends with 'n'.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Pattern Matching",
+        "example": "SELECT * FROM customers WHERE contactFirstName LIKE '____n';",
+        "solution": "**Exact Length Pattern Matching**\n\nUse the underscore (`_`) wildcard to match exactly one character. Five underscores followed by 'n' matches five-character names ending with 'n'.\n\n**Code Example:**\n```sql\nSELECT *\nFROM customers\nWHERE contactFirstName LIKE '____n';\n```\n\n**Explanation:**\n- `'____n'`: Four underscores for any character, then 'n' as the last character."
+    },
+    {
+        "id": 52,
+        "question": "Show customers with odd customerNumber using modulo operator.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Mathematical Operations",
+        "example": "SELECT * FROM customers WHERE customerNumber % 2 != 0;",
+        "solution": "**Finding Odd Numbers with Modulo**\n\nUse the modulo operator (`%`) to check if a number is odd. Odd numbers have a remainder of 1 when divided by 2.\n\n**Code Example:**\n```sql\nSELECT *\nFROM customers\nWHERE customerNumber % 2 != 0;\n```\n\n**Explanation:**\n- `customerNumber % 2 != 0`: Selects rows where the customer number is odd."
+    },
+    {
+        "id": 53,
+        "question": "Find the 5th highest MSRP without using LIMIT.",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Ranking Without LIMIT",
+        "example": "SELECT p1.productName, p1.MSRP\nFROM products p1\nWHERE 4 = (\n  SELECT COUNT(DISTINCT p2.MSRP)\n  FROM products p2\n  WHERE p2.MSRP > p1.MSRP\n);",
+        "solution": "**Finding the Nth Highest Value Using Correlated Subquery**\n\nThis technique counts how many distinct values are greater than the current row's value. When the count matches N-1, you have the Nth highest value.\n\n**Code Example:**\n```sql\nSELECT p1.productName, p1.MSRP\nFROM products p1\nWHERE 4 = (\n  SELECT COUNT(DISTINCT p2.MSRP)\n  FROM products p2\n  WHERE p2.MSRP > p1.MSRP\n);\n```\n\n**Explanation:**\n- For the 5th highest, count must be 4 (four values higher).\n- The subquery counts distinct MSRPs greater than the current row's MSRP.\n- When the count is 4, the outer row is the 5th highest.\n\n**Alternative (MySQL 8+):**\n```sql\nSELECT * FROM (\n  SELECT *, ROW_NUMBER() OVER (ORDER BY MSRP DESC) as rn\n  FROM products\n) ranked WHERE rn = 5;\n```\n\n**Note:** Correlated subqueries can be slow on large tables."
+    },
+    {
+        "id": 54,
+        "question": "Find the second highest payment amount from payments table.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Ranking",
+        "example": "SELECT MAX(amount) \nFROM payments\nWHERE amount NOT IN (SELECT MAX(amount) FROM payments);",
+        "solution": "**Finding the Second Highest Value Using Subquery**\n\nExclude the highest value using a subquery, then find the maximum of the remaining values.\n\n**Code Example:**\n```sql\nSELECT MAX(amount)\nFROM payments\nWHERE amount NOT IN (SELECT MAX(amount) FROM payments);\n```\n\n**Explanation:**\n- The subquery finds the highest payment amount.\n- The outer query finds the maximum among all amounts except the highest, giving the second highest."
+    },
+    {
+        "id": 55,
+        "question": "Show each productName twice in the results using UNION.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "UNION Operations",
+        "example": "SELECT productName FROM products\nUNION ALL\nSELECT productName FROM products\nORDER BY productName;",
+        "solution": "**Duplicating Results with UNION ALL**\n\n`UNION ALL` combines results from multiple queries and includes duplicates, unlike `UNION` which removes them.\n\n**Code Example:**\n```sql\nSELECT productName FROM products\nUNION ALL\nSELECT productName FROM products\nORDER BY productName;\n```\n\n**Explanation:**\n- Each product name appears twice in the result set."
+    },
+    {
+        "id": 56,
+        "question": "Find customers who have not placed any orders using NOT IN.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Subqueries",
+        "example": "SELECT customerName \nFROM customers\nWHERE customerNumber NOT IN (SELECT customerNumber FROM orders);",
+        "solution": "**Finding Unmatched Records with NOT IN**\n\nUse a subquery to get all customer numbers from orders, then select customers whose numbers are not in that list.\n\n**Code Example:**\n```sql\nSELECT customerName\nFROM customers\nWHERE customerNumber NOT IN (SELECT customerNumber FROM orders);\n```\n\n**Explanation:**\n- The subquery gets all customer numbers that have orders.\n- The outer query finds customers not in that list."
+    },
+    {
+        "id": 57,
+        "question": "Get the first 50% of records from employees table.",
+        "difficulty": "Hard",
+        "database": "SQL",
+        "category": "Dynamic Limiting",
+        "example": "SELECT * FROM employees\nLIMIT (SELECT COUNT(*) / 2 FROM employees);",
+        "solution": "**Dynamic Limiting with Subquery**\n\nUse a subquery to calculate half the total row count, then use `LIMIT` to restrict the result set.\n\n**Code Example:**\n```sql\nSELECT *\nFROM employees\nLIMIT (SELECT COUNT(*) / 2 FROM employees);\n```\n\n**Explanation:**\n- The subquery computes half the number of rows in the table.\n- `LIMIT` uses this value to return the first 50% of records."
+    },
+    {
+        "id": 58,
+        "question": "Find productLines with fewer than 20 products using HAVING.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "GROUP BY and HAVING",
+        "example": "SELECT productLine, COUNT(*) AS product_count\nFROM products\nGROUP BY productLine\nHAVING COUNT(*) < 20;",
+        "solution": "**Filtering Groups with HAVING**\n\n`HAVING` filters groups after aggregation, unlike `WHERE` which filters rows before grouping.\n\n**Code Example:**\n```sql\nSELECT productLine, COUNT(*) AS product_count\nFROM products\nGROUP BY productLine\nHAVING COUNT(*) < 20;\n```\n\n**Explanation:**\n- `GROUP BY productLine`: Groups products by product line.\n- `COUNT(*)`: Counts products in each group.\n- `HAVING COUNT(*) < 20`: Only includes groups with fewer than 20 products."
+    },
+    {
+        "id": 59,
+        "question": "Get the last 5 records from customers table.",
+        "difficulty": "Medium",
+        "database": "SQL",
+        "category": "Advanced Ordering",
+        "example": "(SELECT * FROM customers ORDER BY customerNumber DESC LIMIT 5)\nORDER BY customerNumber ASC;",
+        "solution": "**Getting Last N Records and Reordering**\n\nUse a subquery to get the last 5 records by descending order, then reorder them ascending in the outer query.\n\n**Code Example:**\n```sql\nSELECT * FROM (\n  SELECT * FROM customers\n  ORDER BY customerNumber DESC\n  LIMIT 5\n) AS last_customers\nORDER BY customerNumber ASC;\n```\n\n**Explanation:**\n- Inner query gets last 5 customers by descending order.\n- Outer query reorders these 5 in ascending order for display."
+    },
+    {
+        "id": 60,
+        "question": "Create a backup table with same structure and data as customers table.",
+        "difficulty": "Easy",
+        "database": "SQL",
+        "category": "Table Operations",
+        "example": "CREATE TABLE customers_backup AS SELECT * FROM customers;",
+        "solution": "**Creating Backup Tables with CREATE TABLE AS SELECT**\n\nUse `CREATE TABLE ... AS SELECT ...` to make a copy of a table's structure and data.\n\n**Code Example:**\n```sql\nCREATE TABLE customers_backup AS\nSELECT * FROM customers;\n```\n\n**Explanation:**\n- Creates a new table `customers_backup` with the same columns and data as `customers`.\n- Useful for backups, testing, or archiving."
+    }
+]

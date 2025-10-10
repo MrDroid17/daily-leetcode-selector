@@ -3,18 +3,20 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import './JavaScriptPractice.css';
-import ques01_60 from '../data/js_ques_01_60.json';
-import ques61_120 from '../data/js_ques_61_120.json';
-import ques121_180 from '../data/js_ques_121_180.json';
-import ques181_240 from '../data/js_ques_121_180.json';
-import ques241_300 from '../data/js_ques_241_300.json';
+import './DBPractice.css';
+import mongo_ques from '../data/db_mongo_01_100.json';
+import sql_ques from '../data/db_mysql_01_100.json';
+
+/**
+ * Club all the questions here
+ */
+const all_questions = [...mongo_ques, ...sql_ques];
 
 // Custom components for ReactMarkdown
 const components = {
     code({ node, inline, className, children, ...props }) {
         const match = /language-(\w+)/.exec(className || '');
-        const language = match ? match[1] : 'javascript';
+        const language = match ? match[1] : 'sql';
         const codeString = String(children).replace(/\n$/, '');
 
         // Inline code: either explicitly marked as inline OR no language class and short/single line
@@ -44,24 +46,24 @@ const components = {
             }
         };
 
-        // Copy to coding playground function
-        const copyToPlayground = (text) => {
-            console.log('Attempting to copy to playground:', text.substring(0, 50) + '...');
-            // Set code in playground if available
-            if (window.setCodingPlaygroundCode) {
-                console.log('Found setCodingPlaygroundCode function, calling it...');
-                window.setCodingPlaygroundCode(text);
+        // Copy to query editor function (if available)
+        const copyToQueryEditor = (text) => {
+            console.log('Attempting to copy to query editor:', text.substring(0, 50) + '...');
+            // Set code in query editor if available
+            if (window.setDBQueryEditorCode) {
+                console.log('Found setDBQueryEditorCode function, calling it...');
+                window.setDBQueryEditorCode(text);
                 // Show feedback
                 const button = document.activeElement;
                 const originalText = button.textContent;
-                button.textContent = '✅ Sent to Playground!';
+                button.textContent = '✅ Sent to Editor!';
                 button.style.background = '#10b981';
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.background = '#8b5cf6';
                 }, 2000);
             } else {
-                console.log('setCodingPlaygroundCode function not found, falling back to clipboard');
+                console.log('setDBQueryEditorCode function not found, falling back to clipboard');
                 // Fallback to clipboard
                 copyToClipboard(text);
             }
@@ -74,11 +76,11 @@ const components = {
                     <span className="code-language">{language.toUpperCase()}</span>
                     <div className="code-actions">
                         <button
-                            className="copy-playground-btn"
-                            onClick={() => copyToPlayground(codeString)}
-                            title="Send code to coding playground"
+                            className="copy-editor-btn"
+                            onClick={() => copyToQueryEditor(codeString)}
+                            title="Send code to query editor"
                         >
-                            💻 To Playground
+                            🗃️ To Editor
                         </button>
                         <button
                             className="copy-code-btn"
@@ -109,7 +111,7 @@ const components = {
     }
 };
 
-const JavaScriptPractice = () => {
+const DBPractice = () => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showSolution, setShowSolution] = useState(false);
@@ -118,24 +120,44 @@ const JavaScriptPractice = () => {
     const [questionCount, setQuestionCount] = useState(50); // Default question count
     const [isActive, setIsActive] = useState(false);
     const [revisionsQuestions, setRevisionsQuestions] = useState(new Set());
+    const [selectedDatabase, setSelectedDatabase] = useState('All'); // Filter by database type
+    const [selectedDifficulty, setSelectedDifficulty] = useState('All'); // Filter by difficulty
 
-    // Check playground state from window
-    const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
+    // Check query editor state from window
+    const [isQueryEditorOpen, setIsQueryEditorOpen] = useState(false);
 
     // Timer options in minutes
     const timerOptions = [30, 60, 90, 120, 150, 180];
     // Question count options
     const questionCountOptions = [25, 50, 75, 100];
+    // Database options
+    const databaseOptions = ['All', 'MySQL', 'MongoDB'];
+    // Difficulty options
+    const difficultyOptions = ['All', 'Easy', 'Medium', 'Hard'];
 
-    // Initialize questions based on selected count
+    // Initialize questions based on selected filters and count
     const initializeQuestions = useCallback(() => {
-        const shuffled = [...ques01_60, ...ques61_120, ...ques121_180, ...ques181_240, ...ques241_300].sort(() => 0.5 - Math.random());
-        const selectedQuestions = shuffled.slice(0, questionCount);
+        let filteredQuestions = [...all_questions];
+
+        // Filter by database
+        if (selectedDatabase !== 'All') {
+            filteredQuestions = filteredQuestions.filter(q => q.database === selectedDatabase);
+        }
+
+        // Filter by difficulty
+        if (selectedDifficulty !== 'All') {
+            filteredQuestions = filteredQuestions.filter(q => q.difficulty === selectedDifficulty);
+        }
+
+        // Shuffle and select questions
+        const shuffled = filteredQuestions.sort(() => 0.5 - Math.random());
+        const selectedQuestions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+
         setQuestions(selectedQuestions);
         setCurrentQuestionIndex(0);
         setShowSolution(false);
         setRevisionsQuestions(new Set());
-    }, [questionCount]);
+    }, [questionCount, selectedDatabase, selectedDifficulty]);
 
     // Start timer with selected duration
     const startTimer = () => {
@@ -165,26 +187,40 @@ const JavaScriptPractice = () => {
         setTimeLeft(timerDuration * 60);
     };
 
-    // Toggle coding playground
-    const toggleCodingPlayground = () => {
-        window.toggleCodingPlayground?.();
+    // Handle database filter change
+    const handleDatabaseChange = (newDatabase) => {
+        setSelectedDatabase(newDatabase);
+        setIsActive(false);
+        setTimeLeft(timerDuration * 60);
+    };
+
+    // Handle difficulty filter change
+    const handleDifficultyChange = (newDifficulty) => {
+        setSelectedDifficulty(newDifficulty);
+        setIsActive(false);
+        setTimeLeft(timerDuration * 60);
+    };
+
+    // Toggle query editor
+    const toggleQueryEditor = () => {
+        window.toggleDBQueryEditor?.();
         // Update local state based on window state
         setTimeout(() => {
-            setIsPlaygroundOpen(window.getPlaygroundState?.() || false);
+            setIsQueryEditorOpen(window.getDBQueryEditorState?.() || false);
         }, 100);
     };
 
-    // Monitor playground state changes
+    // Monitor query editor state changes
     useEffect(() => {
-        const checkPlaygroundState = () => {
-            setIsPlaygroundOpen(window.getPlaygroundState?.() || false);
+        const checkQueryEditorState = () => {
+            setIsQueryEditorOpen(window.getDBQueryEditorState?.() || false);
         };
 
         // Check initial state
-        checkPlaygroundState();
+        checkQueryEditorState();
 
         // Set up polling to check state changes
-        const interval = setInterval(checkPlaygroundState, 500);
+        const interval = setInterval(checkQueryEditorState, 500);
 
         return () => clearInterval(interval);
     }, []);
@@ -203,7 +239,7 @@ const JavaScriptPractice = () => {
         return () => clearInterval(interval);
     }, [isActive, timeLeft]);
 
-    // Initialize questions on component mount or when questionCount changes
+    // Initialize questions on component mount or when filters change
     useEffect(() => {
         initializeQuestions();
     }, [initializeQuestions]);
@@ -247,17 +283,52 @@ const JavaScriptPractice = () => {
 
     if (questions.length === 0) {
         return (
-            <div className="javascript-practice">
-                <div className="loading">Loading questions...</div>
+            <div className="db-practice">
+                <div className="loading">
+                    {all_questions.length === 0
+                        ? 'Loading questions...'
+                        : 'No questions found for the selected filters. Try different criteria.'
+                    }
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="javascript-practice">
+        <div className="db-practice">
             <div className="practice-header">
-                <h2>JavaScript Practice Session</h2>
+                <h2>Database Practice Session</h2>
                 <div className="session-controls">
+                    <div className="filter-controls">
+                        <label>Database:</label>
+                        <select
+                            value={selectedDatabase}
+                            onChange={(e) => handleDatabaseChange(e.target.value)}
+                            disabled={isActive}
+                            className="filter-select"
+                        >
+                            {databaseOptions.map(db => (
+                                <option key={db} value={db}>
+                                    {db}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="filter-controls">
+                        <label>Difficulty:</label>
+                        <select
+                            value={selectedDifficulty}
+                            onChange={(e) => handleDifficultyChange(e.target.value)}
+                            disabled={isActive}
+                            className="filter-select"
+                        >
+                            {difficultyOptions.map(difficulty => (
+                                <option key={difficulty} value={difficulty}>
+                                    {difficulty}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="timer-controls">
                         <label>Timer Duration:</label>
                         <select
@@ -311,12 +382,12 @@ const JavaScriptPractice = () => {
                     Question {currentQuestionIndex + 1} of {questions.length}
                 </div>
                 <button
-                    onClick={toggleCodingPlayground}
-                    className={`toggle-playground-btn ${isPlaygroundOpen ? 'active' : ''}`}
+                    onClick={toggleQueryEditor}
+                    className={`toggle-editor-btn ${isQueryEditorOpen ? 'active' : ''}`}
                 >
-                    <span className="playground-icon">💻</span>
-                    <span>Coding Playground</span>
-                    <span className={`status-indicator ${isPlaygroundOpen ? 'active' : 'inactive'}`}></span>
+                    <span className="editor-icon">🗃️</span>
+                    <span>Query Editor</span>
+                    <span className={`status-indicator ${isQueryEditorOpen ? 'active' : 'inactive'}`}></span>
                 </button>
             </div>
 
@@ -356,6 +427,7 @@ const JavaScriptPractice = () => {
                             </button>
 
                             <div className="question-meta-bottom">
+                                <span className="database-badge">{currentQuestion.database}</span>
                                 <span className={`difficulty ${currentQuestion.difficulty.toLowerCase()}`}>
                                     {currentQuestion.difficulty}
                                 </span>
@@ -404,15 +476,19 @@ const JavaScriptPractice = () => {
                     <span className="stat-value">{revisionsQuestions.size}/{questions.length}</span>
                 </div>
                 <div className="stat-item">
-                    <span className="stat-label">Remaining:</span>
-                    <span className="stat-value">{questions.length - revisionsQuestions.size}</span>
+                    <span className="stat-label">Database Type:</span>
+                    <span className="stat-value">{selectedDatabase}</span>
+                </div>
+                <div className="stat-item">
+                    <span className="stat-label">Difficulty:</span>
+                    <span className="stat-value">{selectedDifficulty}</span>
                 </div>
                 <button onClick={handleNewSession} className="new-session-btn">
-                    New Session ({questionCount} Random Questions)
+                    New Session ({questionCount} Questions)
                 </button>
             </div>
         </div>
     );
 };
 
-export default JavaScriptPractice;
+export default DBPractice;
