@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { LeetCodePractice, JavaScriptPractice } from "./components";
+import { LeetCodePractice, JavaScriptPractice, DBPractice } from "./components";
 import CodingPlayground from "./components/CodingPlayground";
+import QueryEditor from "./components/QueryEditor";
+import HtmlCssPractice from "./components/HtmlCssPractice";
 import "./App.css";
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dsa'); // 'dsa' or 'javascript'
+  const [activeTab, setActiveTab] = useState('javascript'); // 'dsa', 'javascript', 'htmlcss', or 'database'
   const [showPlayground, setShowPlayground] = useState(false);
+  const [showQueryEditor, setShowQueryEditor] = useState(false);
 
   // Set up global toggle function for JavaScript Practice component
   useEffect(() => {
@@ -22,6 +25,21 @@ function App() {
     };
   }, [showPlayground]);
 
+  // Set up global toggle function for DB Practice component
+  useEffect(() => {
+    window.toggleDBQueryEditor = () => {
+      setShowQueryEditor(prev => !prev);
+    };
+
+    // Also expose the query editor state
+    window.getDBQueryEditorState = () => showQueryEditor;
+
+    return () => {
+      delete window.toggleDBQueryEditor;
+      delete window.getDBQueryEditorState;
+    };
+  }, [showQueryEditor]);
+
   return (
     <div className="app-container">
       {/* Tab Navigation */}
@@ -37,6 +55,18 @@ function App() {
           onClick={() => setActiveTab('javascript')}
         >
           JavaScript Practice
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'htmlcss' ? 'active' : ''}`}
+          onClick={() => setActiveTab('htmlcss')}
+        >
+          HTML & CSS Practice
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'database' ? 'active' : ''}`}
+          onClick={() => setActiveTab('database')}
+        >
+          Database Practice
         </button>
       </div>
 
@@ -56,6 +86,25 @@ function App() {
             {showPlayground && (
               <div className="component-wrapper">
                 <CodingPlayground />
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'htmlcss' && (
+          <div className="single-component-wrapper">
+            <HtmlCssPractice />
+          </div>
+        )}
+
+        {activeTab === 'database' && (
+          <div className={`dual-component-container ${showQueryEditor ? 'playground-active' : ''}`}>
+            <div className="component-wrapper">
+              <DBPractice />
+            </div>
+            {showQueryEditor && (
+              <div className="component-wrapper">
+                <QueryEditor />
               </div>
             )}
           </div>

@@ -3,18 +3,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import './JavaScriptPractice.css';
-import ques01_60 from '../data/js_ques_01_60.json';
-import ques61_120 from '../data/js_ques_61_120.json';
-import ques121_180 from '../data/js_ques_121_180.json';
-import ques181_240 from '../data/js_ques_121_180.json';
-import ques241_300 from '../data/js_ques_241_300.json';
+import './HtmlCssPractice.css';
+import htmlCssQuestions from '../data/html_css_01_100.json';
 
 // Custom components for ReactMarkdown
 const components = {
     code({ node, inline, className, children, ...props }) {
         const match = /language-(\w+)/.exec(className || '');
-        const language = match ? match[1] : 'javascript';
+        const language = match ? match[1] : 'html';
         const codeString = String(children).replace(/\n$/, '');
 
         // Inline code: either explicitly marked as inline OR no language class and short/single line
@@ -44,42 +40,12 @@ const components = {
             }
         };
 
-        // Copy to coding playground function
-        const copyToPlayground = (text) => {
-            console.log('Attempting to copy to playground:', text.substring(0, 50) + '...');
-            // Set code in playground if available
-            if (window.setCodingPlaygroundCode) {
-                console.log('Found setCodingPlaygroundCode function, calling it...');
-                window.setCodingPlaygroundCode(text);
-                // Show feedback
-                const button = document.activeElement;
-                const originalText = button.textContent;
-                button.textContent = '✅ Sent to Playground!';
-                button.style.background = '#10b981';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = '#8b5cf6';
-                }, 2000);
-            } else {
-                console.log('setCodingPlaygroundCode function not found, falling back to clipboard');
-                // Fallback to clipboard
-                copyToClipboard(text);
-            }
-        };
-
         // Code blocks: either has language class OR multiline/long content
         return (
             <div className="code-block-container">
                 <div className="code-block-header">
                     <span className="code-language">{language.toUpperCase()}</span>
                     <div className="code-actions">
-                        <button
-                            className="copy-playground-btn"
-                            onClick={() => copyToPlayground(codeString)}
-                            title="Send code to coding playground"
-                        >
-                            💻 To Playground
-                        </button>
                         <button
                             className="copy-code-btn"
                             onClick={() => copyToClipboard(codeString)}
@@ -109,7 +75,7 @@ const components = {
     }
 };
 
-const JavaScriptPractice = () => {
+const HtmlCssPractice = () => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showSolution, setShowSolution] = useState(false);
@@ -119,25 +85,24 @@ const JavaScriptPractice = () => {
     const [isActive, setIsActive] = useState(false);
     const [revisionsQuestions, setRevisionsQuestions] = useState(new Set());
 
-    // Check playground state from window
-    const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
-
     // Timer options in minutes
     const timerOptions = [30, 60, 90, 120, 150, 180];
     // Question count options
-    const questionCountOptions = [25, 50, 75, 100];
+    const questionCountOptions = [15, 25, 50, 75, 100];
 
     // Initialize questions based on selected count
     const initializeQuestions = useCallback(() => {
-        const shuffled = [...ques01_60, ...ques61_120, ...ques121_180, ...ques181_240, ...ques241_300].sort(() => 0.5 - Math.random());
-        const selectedQuestions = shuffled.slice(0, questionCount);
+        let filteredQuestions = [...htmlCssQuestions];
+
+        // Shuffle and select questions
+        const shuffled = filteredQuestions.sort(() => 0.5 - Math.random());
+        const selectedQuestions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+
         setQuestions(selectedQuestions);
         setCurrentQuestionIndex(0);
         setShowSolution(false);
         setRevisionsQuestions(new Set());
-    }, [questionCount]);
-
-    // Start timer with selected duration
+    }, [questionCount]);    // Start timer with selected duration
     const startTimer = () => {
         setIsActive(true);
         setTimeLeft(timerDuration * 60); // Convert minutes to seconds
@@ -165,30 +130,6 @@ const JavaScriptPractice = () => {
         setTimeLeft(timerDuration * 60);
     };
 
-    // Toggle coding playground
-    const toggleCodingPlayground = () => {
-        window.toggleCodingPlayground?.();
-        // Update local state based on window state
-        setTimeout(() => {
-            setIsPlaygroundOpen(window.getPlaygroundState?.() || false);
-        }, 100);
-    };
-
-    // Monitor playground state changes
-    useEffect(() => {
-        const checkPlaygroundState = () => {
-            setIsPlaygroundOpen(window.getPlaygroundState?.() || false);
-        };
-
-        // Check initial state
-        checkPlaygroundState();
-
-        // Set up polling to check state changes
-        const interval = setInterval(checkPlaygroundState, 500);
-
-        return () => clearInterval(interval);
-    }, []);
-
     // Timer effect
     useEffect(() => {
         let interval = null;
@@ -203,7 +144,7 @@ const JavaScriptPractice = () => {
         return () => clearInterval(interval);
     }, [isActive, timeLeft]);
 
-    // Initialize questions on component mount or when questionCount changes
+    // Initialize questions on component mount or when dependencies change
     useEffect(() => {
         initializeQuestions();
     }, [initializeQuestions]);
@@ -247,16 +188,16 @@ const JavaScriptPractice = () => {
 
     if (questions.length === 0) {
         return (
-            <div className="javascript-practice">
+            <div className="htmlcss-practice">
                 <div className="loading">Loading questions...</div>
             </div>
         );
     }
 
     return (
-        <div className="javascript-practice">
+        <div className="htmlcss-practice">
             <div className="practice-header">
-                <h2>JavaScript Practice Session</h2>
+                <h2>HTML & CSS Practice Session</h2>
                 <div className="session-controls">
                     <div className="timer-controls">
                         <label>Timer Duration:</label>
@@ -310,14 +251,6 @@ const JavaScriptPractice = () => {
                 <div className="progress-info">
                     Question {currentQuestionIndex + 1} of {questions.length}
                 </div>
-                <button
-                    onClick={toggleCodingPlayground}
-                    className={`toggle-playground-btn ${isPlaygroundOpen ? 'active' : ''}`}
-                >
-                    <span className="playground-icon">💻</span>
-                    <span>Coding Playground</span>
-                    <span className={`status-indicator ${isPlaygroundOpen ? 'active' : 'inactive'}`}></span>
-                </button>
             </div>
 
             <div className="question-container">
@@ -333,7 +266,9 @@ const JavaScriptPractice = () => {
                         </button>
 
                         <div className="question-text">
-                            <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>{currentQuestion.question}</ReactMarkdown>
+                            <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+                                {currentQuestion.question}
+                            </ReactMarkdown>
                         </div>
 
                         <button
@@ -356,6 +291,9 @@ const JavaScriptPractice = () => {
                             </button>
 
                             <div className="question-meta-bottom">
+                                <span className={`type-badge ${currentQuestion.type.toLowerCase()}`}>
+                                    {currentQuestion.type}
+                                </span>
                                 <span className={`difficulty ${currentQuestion.difficulty.toLowerCase()}`}>
                                     {currentQuestion.difficulty}
                                 </span>
@@ -373,7 +311,9 @@ const JavaScriptPractice = () => {
                             <div className="solution-content">
                                 <h4>Solution:</h4>
                                 <div className="solution-text">
-                                    <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>{currentQuestion.solution}</ReactMarkdown>
+                                    <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+                                        {currentQuestion.solution}
+                                    </ReactMarkdown>
                                 </div>
                             </div>
                         )}
@@ -415,4 +355,4 @@ const JavaScriptPractice = () => {
     );
 };
 
-export default JavaScriptPractice;
+export default HtmlCssPractice;

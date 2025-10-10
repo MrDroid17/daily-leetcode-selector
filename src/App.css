@@ -13,9 +13,10 @@ body {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Tab Navigation Styles */
@@ -31,56 +32,115 @@ body {
   flex: 1;
   padding: 16px 24px;
   border: none;
-  background-color: transparent;
+  background-color: #f8fafc;
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #6b7280;
+  color: #64748b;
   transition: all 0.2s ease;
   border-bottom: 3px solid transparent;
+  position: relative;
 }
 
 .tab-button:hover {
-  background-color: #f9fafb;
   color: #374151;
+  transform: translateY(-1px);
 }
 
-.tab-button.active {
-  color: #3b82f6;
-  background-color: #eff6ff;
-  border-bottom-color: #3b82f6;
+.tab-button:nth-child(1) {
+  background-color: #fef3c7;
+  /* Light yellow for DSA */
+}
+
+.tab-button:nth-child(1):hover {
+  background-color: #fde68a;
+}
+
+.tab-button:nth-child(1).active {
+  color: #d97706;
+  background-color: #fed7aa;
+  border-bottom-color: #d97706;
+}
+
+.tab-button:nth-child(2) {
+  background-color: #dbeafe;
+  /* Light blue for JavaScript */
+}
+
+.tab-button:nth-child(2):hover {
+  background-color: #bfdbfe;
+}
+
+.tab-button:nth-child(2).active {
+  color: #2563eb;
+  background-color: #dbeafe;
+  border-bottom-color: #2563eb;
+}
+
+.tab-button:nth-child(3) {
+  background-color: #dcfce7;
+  /* Light green for HTML & CSS */
+}
+
+.tab-button:nth-child(3):hover {
+  background-color: #bbf7d0;
+}
+
+.tab-button:nth-child(3).active {
+  color: #16a34a;
+  background-color: #dcfce7;
+  border-bottom-color: #16a34a;
+}
+
+.tab-button:nth-child(4) {
+  background-color: #fce7f3;
+  /* Light pink for Database */
+}
+
+.tab-button:nth-child(4):hover {
+  background-color: #fbcfe8;
+}
+
+.tab-button:nth-child(4).active {
+  color: #db2777;
+  background-color: #fce7f3;
+  border-bottom-color: #db2777;
 }
 
 /* Tab Content */
 .tab-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Single component wrapper for DSA Practice */
 .single-component-wrapper {
-  height: 100%;
+  min-height: calc(100vh - 80px);
   padding: 16px;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Dual component container for JavaScript Practice */
 .dual-component-container {
   display: flex;
-  height: 100%;
+  min-height: calc(100vh - 80px);
   width: 100%;
   overflow-x: hidden;
 }
 
 .component-wrapper {
   width: 50%;
-  height: 100%;
+  min-height: calc(100vh - 80px);
   padding: 16px;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .component-wrapper:first-child {
@@ -104,21 +164,42 @@ body {
 
 /* Responsive design for mobile */
 @media (max-width: 768px) {
+  .app-container {
+    min-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .tab-button {
     padding: 12px 16px;
     font-size: 14px;
   }
 
+  .tab-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .single-component-wrapper {
+    min-height: calc(100vh - 60px);
+    padding: 8px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .dual-component-container {
     flex-direction: column;
-    height: auto;
-    min-height: 100%;
+    min-height: calc(100vh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .component-wrapper {
     width: 100% !important;
-    height: auto;
     min-height: 50vh;
+    padding: 8px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .component-wrapper:first-child {
