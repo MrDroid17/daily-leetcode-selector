@@ -113,9 +113,9 @@ const JavaScriptPractice = () => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [showSolution, setShowSolution] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(60 * 60); // Default 60 minutes in seconds
-    const [timerDuration, setTimerDuration] = useState(60); // Timer duration in minutes
-    const [questionCount, setQuestionCount] = useState(50); // Default question count
+    const [timerDuration, setTimerDuration] = useState(120); // Timer duration in minutes
+    const [timeLeft, setTimeLeft] = useState(120 * 60); // Initialize with timerDuration * 60
+    const [questionCount, setQuestionCount] = useState(100); // Default question count
     const [isActive, setIsActive] = useState(false);
     const [revisionsQuestions, setRevisionsQuestions] = useState(new Set());
 
@@ -127,14 +127,79 @@ const JavaScriptPractice = () => {
     // Question count options
     const questionCountOptions = [25, 50, 75, 100];
 
-    // Initialize questions based on selected count
-    const initializeQuestions = useCallback(() => {
-        const shuffled = [...ques01_60, ...ques61_120, ...ques121_180, ...ques181_240, ...ques241_300].sort(() => 0.5 - Math.random());
+    // Utility function to get current date string
+    const getCurrentDateString = () => {
+        return new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    };
+
+    // Utility function to get storage key
+    const getStorageKey = () => {
+        return `javascript-practice-${getCurrentDateString()}-${questionCount}`;
+    };
+
+    // Clean up old session data
+    const cleanupOldSessions = useCallback(() => {
+        try {
+            const currentDate = getCurrentDateString();
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith('javascript-practice-')) {
+                    const dateMatch = key.match(/javascript-practice-(\d{4}-\d{2}-\d{2})-/);
+                    if (dateMatch && dateMatch[1] !== currentDate) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            });
+        } catch (error) {
+            console.warn('Failed to cleanup old sessions:', error);
+        }
+    }, []);
+
+    // Initialize questions based on selected count with persistence
+    const initializeQuestions = useCallback((forceNew = false) => {
+        const storageKey = getStorageKey();
+
+        // Try to load existing session if not forcing new
+        if (!forceNew) {
+            try {
+                const savedSession = localStorage.getItem(storageKey);
+                if (savedSession) {
+                    const { questions: savedQuestions, revisionsQuestions: savedRevisions } = JSON.parse(savedSession);
+                    if (savedQuestions && savedQuestions.length === questionCount) {
+                        setQuestions(savedQuestions);
+                        setCurrentQuestionIndex(0);
+                        setShowSolution(false);
+                        setRevisionsQuestions(new Set(savedRevisions || []));
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to load saved session:', error);
+            }
+        }
+
+        // Generate new session if no saved session or forced new
+        const allQuestions = [...ques01_60, ...ques61_120, ...ques121_180, ...ques181_240, ...ques241_300];
+        const shuffled = allQuestions.sort(() => 0.5 - Math.random());
         const selectedQuestions = shuffled.slice(0, questionCount);
+
         setQuestions(selectedQuestions);
         setCurrentQuestionIndex(0);
         setShowSolution(false);
         setRevisionsQuestions(new Set());
+
+        // Save new session to localStorage
+        try {
+            const sessionData = {
+                questions: selectedQuestions,
+                revisionsQuestions: [],
+                date: getCurrentDateString(),
+                count: questionCount
+            };
+            localStorage.setItem(storageKey, JSON.stringify(sessionData));
+        } catch (error) {
+            console.warn('Failed to save session:', error);
+        }
     }, [questionCount]);
 
     // Start timer with selected duration
@@ -205,8 +270,9 @@ const JavaScriptPractice = () => {
 
     // Initialize questions on component mount or when questionCount changes
     useEffect(() => {
+        cleanupOldSessions(); // Clean up old session data first
         initializeQuestions();
-    }, [initializeQuestions]);
+    }, [initializeQuestions, cleanupOldSessions]);
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -236,10 +302,23 @@ const JavaScriptPractice = () => {
             newRevisions.add(currentQuestionIndex);
         }
         setRevisionsQuestions(newRevisions);
+
+        // Update localStorage with new revision state
+        try {
+            const storageKey = getStorageKey();
+            const savedSession = localStorage.getItem(storageKey);
+            if (savedSession) {
+                const sessionData = JSON.parse(savedSession);
+                sessionData.revisionsQuestions = Array.from(newRevisions);
+                localStorage.setItem(storageKey, JSON.stringify(sessionData));
+            }
+        } catch (error) {
+            console.warn('Failed to save revision state:', error);
+        }
     };
 
     const handleNewSession = () => {
-        initializeQuestions();
+        initializeQuestions(true); // Force new session
         resetTimer();
     };
 
@@ -296,7 +375,7 @@ const JavaScriptPractice = () => {
                     <span className={`time ${timeLeft < 300 ? 'warning' : ''}`}>
                         ⏱️ {formatTime(timeLeft)}
                     </span>
-                    {!isActive && timeLeft === timerDuration * 60 && (
+                    {!isActive && (
                         <button onClick={startTimer} className="start-timer-btn">
                             Start Timer
                         </button>

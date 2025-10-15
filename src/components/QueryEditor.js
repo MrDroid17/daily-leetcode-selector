@@ -298,7 +298,7 @@ const QueryEditor = () => {
                                     padding: '16px',
                                     background: 'transparent',
                                     fontSize: '14px',
-                                    lineHeight: '1.5',
+                                    lineHeight: '21px',
                                     fontFamily: "'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
                                     position: 'absolute',
                                     top: 0,
@@ -307,7 +307,19 @@ const QueryEditor = () => {
                                     bottom: 0,
                                     pointerEvents: 'none',
                                     color: 'transparent',
-                                    overflow: 'hidden'
+                                    overflow: 'hidden',
+                                    whiteSpace: 'pre',
+                                    wordWrap: 'normal',
+                                    overflowWrap: 'normal',
+                                    textRendering: 'geometricPrecision',
+                                    fontVariantLigatures: 'none',
+                                    WebkitFontSmoothing: 'subpixel-antialiased',
+                                    MozOsxFontSmoothing: 'auto',
+                                    boxSizing: 'border-box',
+                                    letterSpacing: 0,
+                                    wordSpacing: 0,
+                                    fontFeatureSettings: 'normal',
+                                    fontKerning: 'none'
                                 }}
                                 showLineNumbers={false}
                                 wrapLines={false}
@@ -325,6 +337,7 @@ const QueryEditor = () => {
                             placeholder={`Write your ${queryType.toUpperCase()} query here...`}
                             spellCheck={false}
                             autoComplete="off"
+                            wrap="off"
                         />
                     </div>
                 </div>

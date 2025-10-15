@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { LeetCodePractice, JavaScriptPractice, DBPractice } from "./components";
+import { LeetCodePractice, JavaScriptPractice, DBPractice, MeanMernPractice } from "./components";
 import CodingPlayground from "./components/CodingPlayground";
 import QueryEditor from "./components/QueryEditor";
 import HtmlCssPractice from "./components/HtmlCssPractice";
 import "./App.css";
 
 function App() {
-  const [activeTab, setActiveTab] = useState('javascript'); // 'dsa', 'javascript', 'htmlcss', or 'database'
+  const [activeTab, setActiveTab] = useState('javascript'); // Start with HTML & CSS as default
   const [showPlayground, setShowPlayground] = useState(false);
   const [showQueryEditor, setShowQueryEditor] = useState(false);
 
@@ -45,10 +45,10 @@ function App() {
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
-          className={`tab-button ${activeTab === 'dsa' ? 'active' : ''}`}
-          onClick={() => setActiveTab('dsa')}
+          className={`tab-button ${activeTab === 'htmlcss' ? 'active' : ''}`}
+          onClick={() => setActiveTab('htmlcss')}
         >
-          DSA Practice
+          HTML & CSS Practice
         </button>
         <button
           className={`tab-button ${activeTab === 'javascript' ? 'active' : ''}`}
@@ -57,10 +57,10 @@ function App() {
           JavaScript Practice
         </button>
         <button
-          className={`tab-button ${activeTab === 'htmlcss' ? 'active' : ''}`}
-          onClick={() => setActiveTab('htmlcss')}
+          className={`tab-button ${activeTab === 'meanmern' ? 'active' : ''}`}
+          onClick={() => setActiveTab('meanmern')}
         >
-          HTML & CSS Practice
+          MEAN/MERN Practice
         </button>
         <button
           className={`tab-button ${activeTab === 'database' ? 'active' : ''}`}
@@ -68,13 +68,19 @@ function App() {
         >
           Database Practice
         </button>
+        <button
+          className={`tab-button ${activeTab === 'dsa' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dsa')}
+        >
+          LeetCode Practice
+        </button>
       </div>
 
       {/* Tab Content */}
       <div className="tab-content">
-        {activeTab === 'dsa' && (
+        {activeTab === 'htmlcss' && (
           <div className="single-component-wrapper">
-            <LeetCodePractice />
+            <HtmlCssPractice />
           </div>
         )}
 
@@ -91,9 +97,9 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'htmlcss' && (
+        {activeTab === 'meanmern' && (
           <div className="single-component-wrapper">
-            <HtmlCssPractice />
+            <MeanMernPractice />
           </div>
         )}
 
@@ -107,6 +113,12 @@ function App() {
                 <QueryEditor />
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'dsa' && (
+          <div className="single-component-wrapper">
+            <LeetCodePractice />
           </div>
         )}
       </div>

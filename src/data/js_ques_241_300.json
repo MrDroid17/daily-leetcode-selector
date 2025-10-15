@@ -38,5 +38,21 @@
         "solution": "To create a type-safe custom hook, you should use **generics**. By defining a generic type parameter (e.g., `<T>`), your hook can work with any data type while maintaining type safety. The hook's return type should be explicitly defined to describe the shape of the object it returns (e.g., `{ data: T | null; loading: boolean; error: Error | null }`). When using the hook, you provide the specific type you expect to receive, which enables full type checking and autocompletion in your component.",
         "category": "TypeScript",
         "difficulty": "Medium"
+    },
+    {
+        "id": 246,
+        "question": "## Merge user and profile objects by user ID",
+        "example": "```javascript\nconst users1 = [\n  { id: 1, email: 'dcontreras@email.tld' },\n  { id: 2, email: 'afeher@email.tld' },\n  { id: 3, email: 'odj@email.tld' },\n];\n\nconst profiles1 = [\n  { userId: 1, firstName: 'Danielle', lastName: 'Contreras' },\n  { userId: 2, firstName: 'Alfredas', lastName: 'Fehér' },\n  { userId: 3, firstName: 'Orpheus', lastName: 'De Jong' },\n];\n\n// Expected output:\nconst output = [\n    { id: 1, email: 'dcontreras@email.tld', profile: { userId: 1, firstName: 'Danielle', lastName: 'Contreras' } },\n    { id: 2, email: 'afeher@email.tld', profile: { userId: 2, firstName: 'Alfredas', lastName: 'Fehér' } },\n    { id: 3, email: 'odj@email.tld', profile: { userId: 3, firstName: 'Orpheus', lastName: 'De Jong' } },\n]\n```",
+        "solution": "**Solution 1: Using map() with find()**\n```javascript\nconst output = users1.map(user => ({\n  ...user,\n  profile: profiles1.find(profile => profile.userId === user.id)\n}));\n```\n\n**Solution 2: Using HashMap for O(n) performance**\n```javascript\nfunction mergeUserProfiles(users, profiles) {\n    // Create a map for O(1) profile lookup\n    const profileMap = {};\n    profiles.forEach(profile => {\n        profileMap[profile.userId] = profile;\n    });\n    \n    // Map users with their profiles\n    return users.map(user => ({\n        ...user,\n        profile: profileMap[user.id]\n    }));\n}\n```\n\n**Performance Note:** Solution 1 has O(n²) complexity due to find() inside map(). Solution 2 is more efficient with O(n) complexity by creating a lookup map first.",
+        "category": "JavaScript",
+        "difficulty": "Medium"
+    },
+    {
+        "id": 247,
+        "question": "## What would be the output of `null == undefined` vs `null === undefined`?",
+        "example": "```javascript\nconsole.log(null == undefined);\nconsole.log(null === undefined);\n\n// Additional comparisons:\nconsole.log(typeof null);\nconsole.log(typeof undefined);\nconsole.log(null == null);\nconsole.log(undefined === undefined);\n```",
+        "solution": "**Output:**\n```\ntrue\nfalse\nobject\nundefined\ntrue\ntrue\n```\n\n**Detailed Explanation:**\n\n**1. Loose Equality (`==`) - Abstract Equality Comparison:**\n- `null == undefined` returns `true`\n- JavaScript's `==` operator performs type coercion before comparison\n- According to ECMAScript specification, `null` and `undefined` are considered equal when using `==`\n- This is a special case defined in the language specification (Section 7.2.14)\n- No type conversion actually occurs here - it's explicitly defined that `null == undefined` returns `true`\n\n**2. Strict Equality (`===`) - Strict Equality Comparison:**\n- `null === undefined` returns `false`\n- The `===` operator checks both **value AND type** without any coercion\n- `null` and `undefined` are different types:\n  - `typeof null` returns `\"object\"` (this is actually a known JavaScript bug/quirk)\n  - `typeof undefined` returns `\"undefined\"`\n- Since they have different types, `===` returns `false`\n\n**Best Practice:**\n```javascript\n// ✅ Check for both null and undefined\nif (value == null) { /* handles both */ }\n\n// ✅ Modern approach: Use nullish coalescing\nconst result = value ?? \"default value\";\n\n// ✅ Specific checks\nif (value === null) { /* only null */ }\nif (value === undefined) { /* only undefined */ }\n```",
+        "category": "JavaScript",
+        "difficulty": "Medium"
     }
 ]

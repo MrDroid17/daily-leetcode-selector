@@ -239,7 +239,7 @@ const CodingPlayground = () => {
                                         padding: '16px',
                                         margin: 0,
                                         fontSize: '14px',
-                                        lineHeight: '1.5',
+                                        lineHeight: '21px',
                                         fontFamily: "'Monaco', 'Menlo', 'Ubuntu Mono', monospace",
                                         borderRadius: 0,
                                         height: '100%',
@@ -248,10 +248,22 @@ const CodingPlayground = () => {
                                         top: 0,
                                         left: 0,
                                         width: '100%',
-                                        zIndex: 1
+                                        zIndex: 1,
+                                        whiteSpace: 'pre',
+                                        wordWrap: 'normal',
+                                        overflowWrap: 'normal',
+                                        textRendering: 'geometricPrecision',
+                                        fontVariantLigatures: 'none',
+                                        WebkitFontSmoothing: 'subpixel-antialiased',
+                                        MozOsxFontSmoothing: 'auto',
+                                        boxSizing: 'border-box',
+                                        letterSpacing: 0,
+                                        wordSpacing: 0,
+                                        fontFeatureSettings: 'normal',
+                                        fontKerning: 'none'
                                     }}
                                     showLineNumbers={false}
-                                    wrapLines={true}
+                                    wrapLines={false}
                                 >
                                     {userCode}
                                 </SyntaxHighlighter>
@@ -266,6 +278,7 @@ const CodingPlayground = () => {
                                 placeholder={`Write your ${language} code here...`}
                                 spellCheck={false}
                                 autoComplete="off"
+                                wrap="off"
                             />
                         </div>
                     </div>

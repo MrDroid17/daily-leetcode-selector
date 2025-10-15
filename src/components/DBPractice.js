@@ -135,8 +135,58 @@ const DBPractice = () => {
     // Difficulty options
     const difficultyOptions = ['All', 'Easy', 'Medium', 'Hard'];
 
-    // Initialize questions based on selected filters and count
-    const initializeQuestions = useCallback(() => {
+    // Utility function to get current date string
+    const getCurrentDateString = () => {
+        return new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    };
+
+    // Utility function to get storage key
+    const getStorageKey = () => {
+        return `db-practice-${getCurrentDateString()}-${questionCount}-${selectedDatabase}-${selectedDifficulty}`;
+    };
+
+    // Clean up old session data
+    const cleanupOldSessions = useCallback(() => {
+        try {
+            const currentDate = getCurrentDateString();
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith('db-practice-')) {
+                    const dateMatch = key.match(/db-practice-(\d{4}-\d{2}-\d{2})-/);
+                    if (dateMatch && dateMatch[1] !== currentDate) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            });
+        } catch (error) {
+            console.warn('Failed to cleanup old sessions:', error);
+        }
+    }, []);
+
+    // Initialize questions based on selected filters and count with persistence
+    const initializeQuestions = useCallback((forceNew = false) => {
+        const storageKey = getStorageKey();
+
+        // Try to load existing session if not forcing new
+        if (!forceNew) {
+            try {
+                const savedSession = localStorage.getItem(storageKey);
+                if (savedSession) {
+                    const { questions: savedQuestions, revisionsQuestions: savedRevisions } = JSON.parse(savedSession);
+                    if (savedQuestions && savedQuestions.length <= questionCount) {
+                        setQuestions(savedQuestions);
+                        setCurrentQuestionIndex(0);
+                        setShowSolution(false);
+                        setRevisionsQuestions(new Set(savedRevisions || []));
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to load saved session:', error);
+            }
+        }
+
+        // Generate new session if no saved session or forced new
         let filteredQuestions = [...all_questions];
 
         // Filter by database
@@ -157,6 +207,21 @@ const DBPractice = () => {
         setCurrentQuestionIndex(0);
         setShowSolution(false);
         setRevisionsQuestions(new Set());
+
+        // Save new session to localStorage
+        try {
+            const sessionData = {
+                questions: selectedQuestions,
+                revisionsQuestions: [],
+                date: getCurrentDateString(),
+                count: questionCount,
+                database: selectedDatabase,
+                difficulty: selectedDifficulty
+            };
+            localStorage.setItem(storageKey, JSON.stringify(sessionData));
+        } catch (error) {
+            console.warn('Failed to save session:', error);
+        }
     }, [questionCount, selectedDatabase, selectedDifficulty]);
 
     // Start timer with selected duration
@@ -241,8 +306,9 @@ const DBPractice = () => {
 
     // Initialize questions on component mount or when filters change
     useEffect(() => {
+        cleanupOldSessions(); // Clean up old session data first
         initializeQuestions();
-    }, [initializeQuestions]);
+    }, [initializeQuestions, cleanupOldSessions]);
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
@@ -272,10 +338,23 @@ const DBPractice = () => {
             newRevisions.add(currentQuestionIndex);
         }
         setRevisionsQuestions(newRevisions);
+
+        // Update localStorage with new revision state
+        try {
+            const storageKey = getStorageKey();
+            const savedSession = localStorage.getItem(storageKey);
+            if (savedSession) {
+                const sessionData = JSON.parse(savedSession);
+                sessionData.revisionsQuestions = Array.from(newRevisions);
+                localStorage.setItem(storageKey, JSON.stringify(sessionData));
+            }
+        } catch (error) {
+            console.warn('Failed to save revision state:', error);
+        }
     };
 
     const handleNewSession = () => {
-        initializeQuestions();
+        initializeQuestions(true); // Force new session
         resetTimer();
     };
 
