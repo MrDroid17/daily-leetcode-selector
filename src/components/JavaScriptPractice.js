@@ -155,6 +155,22 @@ const JavaScriptPractice = () => {
         }
     }, []);
 
+    // Function to update current question index in localStorage
+    const updateCurrentQuestionIndex = useCallback((newIndex) => {
+        setCurrentQuestionIndex(newIndex);
+        try {
+            const storageKey = getStorageKey();
+            const savedSession = localStorage.getItem(storageKey);
+            if (savedSession) {
+                const sessionData = JSON.parse(savedSession);
+                sessionData.currentQuestionIndex = newIndex;
+                localStorage.setItem(storageKey, JSON.stringify(sessionData));
+            }
+        } catch (error) {
+            console.warn('Failed to save current question index:', error);
+        }
+    }, []);
+
     // Initialize questions based on selected count with persistence
     const initializeQuestions = useCallback((forceNew = false) => {
         const storageKey = getStorageKey();
@@ -164,10 +180,14 @@ const JavaScriptPractice = () => {
             try {
                 const savedSession = localStorage.getItem(storageKey);
                 if (savedSession) {
-                    const { questions: savedQuestions, revisionsQuestions: savedRevisions } = JSON.parse(savedSession);
+                    const {
+                        questions: savedQuestions,
+                        revisionsQuestions: savedRevisions,
+                        currentQuestionIndex: savedCurrentIndex
+                    } = JSON.parse(savedSession);
                     if (savedQuestions && savedQuestions.length === questionCount) {
                         setQuestions(savedQuestions);
-                        setCurrentQuestionIndex(0);
+                        setCurrentQuestionIndex(savedCurrentIndex || 0);
                         setShowSolution(false);
                         setRevisionsQuestions(new Set(savedRevisions || []));
                         return;
@@ -193,6 +213,7 @@ const JavaScriptPractice = () => {
             const sessionData = {
                 questions: selectedQuestions,
                 revisionsQuestions: [],
+                currentQuestionIndex: 0,
                 date: getCurrentDateString(),
                 count: questionCount
             };
@@ -282,14 +303,14 @@ const JavaScriptPractice = () => {
 
     const handleNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            updateCurrentQuestionIndex(currentQuestionIndex + 1);
             setShowSolution(false);
         }
     };
 
     const handlePreviousQuestion = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(currentQuestionIndex - 1);
+            updateCurrentQuestionIndex(currentQuestionIndex - 1);
             setShowSolution(false);
         }
     };
@@ -310,6 +331,7 @@ const JavaScriptPractice = () => {
             if (savedSession) {
                 const sessionData = JSON.parse(savedSession);
                 sessionData.revisionsQuestions = Array.from(newRevisions);
+                sessionData.currentQuestionIndex = currentQuestionIndex; // Also save current index
                 localStorage.setItem(storageKey, JSON.stringify(sessionData));
             }
         } catch (error) {
@@ -466,7 +488,7 @@ const JavaScriptPractice = () => {
                         <button
                             key={index}
                             onClick={() => {
-                                setCurrentQuestionIndex(index);
+                                updateCurrentQuestionIndex(index);
                                 setShowSolution(false);
                             }}
                             className={`question-dot ${index === currentQuestionIndex ? 'active' : ''} ${revisionsQuestions.has(index) ? 'revision' : ''}`}

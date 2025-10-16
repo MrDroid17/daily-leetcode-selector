@@ -4,7 +4,7 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './CodingPlayground.css';
 
 const CodingPlayground = () => {
-    const [userCode, setUserCode] = useState('// Write your JavaScript or TypeScript code here\nconsole.log("Hello, World!");');
+    const [userCode, setUserCode] = useState('// Write your JavaScript code here\nconsole.log("Hello, World!");');
     const [output, setOutput] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [language, setLanguage] = useState('javascript'); // 'javascript' or 'typescript'
@@ -16,6 +16,14 @@ const CodingPlayground = () => {
         window.setCodingPlaygroundCode = (code) => {
             console.log('Received code for playground:', code.substring(0, 50) + '...');
             setUserCode(code);
+            // Focus the textarea after setting the code
+            setTimeout(() => {
+                if (textareaRef.current) {
+                    textareaRef.current.focus();
+                    // Position cursor at the end of the code
+                    textareaRef.current.setSelectionRange(code.length, code.length);
+                }
+            }, 100);
         };
 
         return () => {
@@ -101,6 +109,15 @@ const CodingPlayground = () => {
         const textarea = e.target;
         const { selectionStart, selectionEnd, value } = textarea;
 
+        // Handle Ctrl+Enter to run code
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            if (!isRunning) {
+                handleRunCode();
+            }
+            return;
+        }
+
         // Handle Tab key for indentation
         if (e.key === 'Tab') {
             e.preventDefault();
@@ -124,18 +141,39 @@ const CodingPlayground = () => {
             const logs = [];
             const customConsole = {
                 log: (...args) => {
-                    logs.push('📝 ' + args.map(arg =>
+                    const message = '📝 ' + args.map(arg =>
                         typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-                    ).join(' '));
+                    ).join(' ');
+                    logs.push(message);
+                    // Update output in real-time for async operations
+                    setOutput(prev => {
+                        const lines = prev.split('\n').filter(line => !line.includes('🔄 Running code'));
+                        return [...lines, message].join('\n');
+                    });
                 },
                 error: (...args) => {
-                    logs.push('❌ Error: ' + args.map(arg => String(arg)).join(' '));
+                    const message = '❌ Error: ' + args.map(arg => String(arg)).join(' ');
+                    logs.push(message);
+                    setOutput(prev => {
+                        const lines = prev.split('\n').filter(line => !line.includes('🔄 Running code'));
+                        return [...lines, message].join('\n');
+                    });
                 },
                 warn: (...args) => {
-                    logs.push('⚠️ Warning: ' + args.map(arg => String(arg)).join(' '));
+                    const message = '⚠️ Warning: ' + args.map(arg => String(arg)).join(' ');
+                    logs.push(message);
+                    setOutput(prev => {
+                        const lines = prev.split('\n').filter(line => !line.includes('🔄 Running code'));
+                        return [...lines, message].join('\n');
+                    });
                 },
                 info: (...args) => {
-                    logs.push('ℹ️ Info: ' + args.map(arg => String(arg)).join(' '));
+                    const message = 'ℹ️ Info: ' + args.map(arg => String(arg)).join(' ');
+                    logs.push(message);
+                    setOutput(prev => {
+                        const lines = prev.split('\n').filter(line => !line.includes('🔄 Running code'));
+                        return [...lines, message].join('\n');
+                    });
                 }
             };
 
@@ -143,7 +181,9 @@ const CodingPlayground = () => {
 
             // If TypeScript, show a note and convert to JavaScript
             if (language === 'typescript') {
-                logs.push('🔧 Converting TypeScript to JavaScript...');
+                const tsMessage = '🔧 Converting TypeScript to JavaScript...';
+                logs.push(tsMessage);
+                setOutput(tsMessage);
                 // Simple TypeScript to JavaScript conversion
                 codeToExecute = userCode
                     .replace(/:\s*\w+(\[\])?(\s*[=,)}])/g, '$2') // Remove type annotations
@@ -151,20 +191,61 @@ const CodingPlayground = () => {
                     .replace(/function\s+(\w+)\s*\([^)]*\)\s*:\s*\w+(\[\])?\s*{/g, 'function $1() {'); // Clean function return types
             }
 
-            // Create a safe execution environment
-            const func = new Function('console', codeToExecute);
-            func(customConsole);
+            // Clear the "Running code..." message
+            setOutput('');
 
-            if (logs.length === 0 || (logs.length === 1 && logs[0].includes('Converting TypeScript'))) {
-                logs.push('✅ Code executed successfully (no output)');
-            } else if (language === 'typescript' && logs.length > 1) {
-                logs.push('✅ TypeScript code executed successfully');
+            // Create an async execution environment
+            const createAsyncFunction = (code, console) => {
+                return new Function('console', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'Promise', `
+                    return (async () => {
+                        ${code}
+                    })();
+                `);
+            };
+
+            // Execute the code with proper async handling
+            const asyncFunc = createAsyncFunction(codeToExecute, customConsole);
+
+            // Set a timeout to handle long-running or infinite loops
+            const executionTimeout = setTimeout(() => {
+                setOutput(prev => prev + '\n⏰ Execution timeout - stopping after 10 seconds');
+                setIsRunning(false);
+            }, 10000);
+
+            try {
+                await asyncFunc(
+                    customConsole,
+                    (callback, delay) => setTimeout(() => {
+                        callback();
+                    }, delay),
+                    (callback, delay) => setInterval(() => {
+                        callback();
+                    }, delay),
+                    clearTimeout,
+                    clearInterval,
+                    Promise
+                );
+            } catch (execError) {
+                throw execError;
+            } finally {
+                clearTimeout(executionTimeout);
             }
 
-            setOutput(logs.join('\n'));
+            // Add completion message after a short delay to catch any late async outputs
+            setTimeout(() => {
+                if (logs.length === 0 || (logs.length === 1 && logs[0].includes('Converting TypeScript'))) {
+                    setOutput(prev => prev + '\n✅ Code executed successfully (no output)');
+                } else if (language === 'typescript' && logs.length > 0) {
+                    setOutput(prev => prev + '\n✅ TypeScript code executed successfully');
+                } else if (logs.length > 0) {
+                    setOutput(prev => prev + '\n✅ Code executed successfully');
+                }
+                setIsRunning(false);
+            }, 500); // Wait 500ms to catch any pending async operations
+
         } catch (error) {
+            clearTimeout(); // Clear any pending timeouts
             setOutput(`❌ Runtime Error: ${error.message}\n\n💡 Check your syntax and logic.`);
-        } finally {
             setIsRunning(false);
         }
     };
@@ -222,8 +303,9 @@ const CodingPlayground = () => {
                                 onClick={handleRunCode}
                                 disabled={isRunning}
                                 className="run-btn"
+                                title="Run code (Ctrl+Enter)"
                             >
-                                {isRunning ? 'Running...' : 'Run'}
+                                {isRunning ? 'Running...' : 'Run (Ctrl+Enter)'}
                             </button>
                         </div>
                     </div>

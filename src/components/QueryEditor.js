@@ -30,6 +30,14 @@ const QueryEditor = () => {
             const detectedType = query.toLowerCase().includes('db.') || query.toLowerCase().includes('find(') || query.toLowerCase().includes('aggregate(') ? 'mongodb' : 'sql';
             setQueryType(detectedType);
             setUserQuery(query);
+            // Focus the textarea after setting the query
+            setTimeout(() => {
+                if (textareaRef.current) {
+                    textareaRef.current.focus();
+                    // Position cursor at the end of the query
+                    textareaRef.current.setSelectionRange(query.length, query.length);
+                }
+            }, 100);
         };
 
         return () => {
@@ -98,6 +106,15 @@ const QueryEditor = () => {
     const handleKeyDown = (e) => {
         const textarea = e.target;
         const { selectionStart, selectionEnd, value } = textarea;
+
+        // Handle Ctrl+Enter to analyze query
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            if (!isRunning) {
+                handleRunQuery();
+            }
+            return;
+        }
 
         // Handle Tab key for indentation
         if (e.key === 'Tab') {
@@ -282,8 +299,9 @@ const QueryEditor = () => {
                                 onClick={handleRunQuery}
                                 disabled={isRunning}
                                 className="run-btn"
+                                title="Analyze query (Ctrl+Enter)"
                             >
-                                {isRunning ? 'Analyzing...' : 'Analyze'}
+                                {isRunning ? 'Analyzing...' : 'Analyze (Ctrl+Enter)'}
                             </button>
                         </div>
                     </div>
