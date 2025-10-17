@@ -649,6 +649,13 @@
     font-weight: 600;
 }
 
+.session-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .new-session-btn {
     padding: 12px 24px;
     background-color: #7c3aed;
@@ -663,6 +670,26 @@
 
 .new-session-btn:hover {
     background-color: #6d28d9;
+    transform: translateY(-1px);
+}
+
+.open-revision-btn {
+    padding: 12px 20px;
+    background-color: #059669;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.open-revision-btn:hover {
+    background-color: #047857;
     transform: translateY(-1px);
 }
 
@@ -855,6 +882,17 @@
         text-align: center;
         gap: 12px;
         padding: 12px;
+    }
+
+    .session-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .new-session-btn,
+    .open-revision-btn {
+        width: 100%;
     }
 
     .stat-item {

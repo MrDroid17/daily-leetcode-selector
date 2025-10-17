@@ -7,7 +7,7 @@ import './JavaScriptPractice.css';
 import ques01_60 from '../data/js_ques_01_60.json';
 import ques61_120 from '../data/js_ques_61_120.json';
 import ques121_180 from '../data/js_ques_121_180.json';
-import ques181_240 from '../data/js_ques_121_180.json';
+import ques181_240 from '../data/js_ques_180_240.json';
 import ques241_300 from '../data/js_ques_241_300.json';
 
 // Custom components for ReactMarkdown
@@ -354,10 +354,82 @@ const JavaScriptPractice = () => {
         );
     }
 
+    // Get total marked questions count across all sessions
+    const getTotalMarkedCount = () => {
+        const currentDate = new Date().toISOString().split('T')[0];
+        let totalCount = 0;
+
+        try {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if ((key.startsWith('javascript-practice-') ||
+                    key.startsWith('htmlcss-practice-') ||
+                    key.startsWith('db-practice-')) &&
+                    key.includes(currentDate)) {
+                    try {
+                        const sessionData = JSON.parse(localStorage.getItem(key));
+                        if (sessionData.revisionsQuestions && sessionData.revisionsQuestions.length > 0) {
+                            totalCount += sessionData.revisionsQuestions.length;
+                        }
+                    } catch (error) {
+                        console.warn('Error counting marked questions:', error);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error getting total marked count:', error);
+        }
+
+        return totalCount;
+    };
+
     return (
         <div className="javascript-practice">
             <div className="practice-header">
-                <h2>JavaScript Practice Session</h2>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '20px'
+                }}>
+                    <h2 style={{
+                        margin: 0,
+                        color: '#1e293b',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                    }}>
+                        JavaScript Practice Session
+                    </h2>
+                    {getTotalMarkedCount() > 0 && (
+                        <button
+                            onClick={() => window.openMarkedForRevision && window.openMarkedForRevision()}
+                            style={{
+                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                marginLeft: '50px',
+                                marginTop: '20px'
+                            }}
+                        >
+                            <span style={{
+                                fontSize: '22px',
+                                fontWeight: 'bold',
+                                lineHeight: '1'
+                            }}>
+                                {getTotalMarkedCount()}
+                            </span>
+                            <span>Revision</span>
+                        </button>
+                    )}
+                </div>
                 <div className="session-controls">
                     <div className="timer-controls">
                         <label>Timer Duration:</label>
@@ -508,9 +580,11 @@ const JavaScriptPractice = () => {
                     <span className="stat-label">Remaining:</span>
                     <span className="stat-value">{questions.length - revisionsQuestions.size}</span>
                 </div>
-                <button onClick={handleNewSession} className="new-session-btn">
-                    New Session ({questionCount} Random Questions)
-                </button>
+                <div className="session-actions">
+                    <button onClick={handleNewSession} className="new-session-btn">
+                        New Session ({questionCount} Random Questions)
+                    </button>
+                </div>
             </div>
         </div>
     );

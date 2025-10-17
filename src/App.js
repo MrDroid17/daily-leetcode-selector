@@ -3,12 +3,25 @@ import { LeetCodePractice, JavaScriptPractice, DBPractice, MeanMernPractice } fr
 import CodingPlayground from "./components/CodingPlayground";
 import QueryEditor from "./components/QueryEditor";
 import HtmlCssPractice from "./components/HtmlCssPractice";
+import MarkedForRevision from "./components/MarkedForRevision";
 import "./App.css";
 
 function App() {
   const [activeTab, setActiveTab] = useState('javascript'); // Start with HTML & CSS as default
   const [showPlayground, setShowPlayground] = useState(false);
   const [showQueryEditor, setShowQueryEditor] = useState(false);
+  const [showMarkedForRevision, setShowMarkedForRevision] = useState(false);
+
+  // Set up global toggle function for MarkedForRevision component
+  useEffect(() => {
+    window.openMarkedForRevision = () => {
+      setShowMarkedForRevision(true);
+    };
+
+    return () => {
+      delete window.openMarkedForRevision;
+    };
+  }, []);
 
   // Set up global toggle function for JavaScript Practice component
   useEffect(() => {
@@ -42,6 +55,11 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* MarkedForRevision Overlay */}
+      {showMarkedForRevision && (
+        <MarkedForRevision onClose={() => setShowMarkedForRevision(false)} />
+      )}
+
       {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
