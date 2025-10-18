@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/daily-leetcode-selector/static/css/main.d1f6cf21.css",
-    "main.js": "/daily-leetcode-selector/static/js/main.dc93395a.js",
+    "main.js": "/daily-leetcode-selector/static/js/main.c1d3b36f.js",
     "static/js/453.5855bd60.chunk.js": "/daily-leetcode-selector/static/js/453.5855bd60.chunk.js",
     "index.html": "/daily-leetcode-selector/index.html",
     "main.d1f6cf21.css.map": "/daily-leetcode-selector/static/css/main.d1f6cf21.css.map",
-    "main.dc93395a.js.map": "/daily-leetcode-selector/static/js/main.dc93395a.js.map",
+    "main.c1d3b36f.js.map": "/daily-leetcode-selector/static/js/main.c1d3b36f.js.map",
     "453.5855bd60.chunk.js.map": "/daily-leetcode-selector/static/js/453.5855bd60.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d1f6cf21.css",
-    "static/js/main.dc93395a.js"
+    "static/js/main.c1d3b36f.js"
   ]
 }
