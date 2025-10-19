@@ -6,11 +6,12 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './DBPractice.css';
 import mongo_ques from '../data/db_mongo_01_100.json';
 import sql_ques from '../data/db_mysql_01_100.json';
+import graphql_ques from '../data/db_graphql_01_100.json';
 
 /**
  * Club all the questions here
  */
-const all_questions = [...mongo_ques, ...sql_ques];
+const all_questions = [...mongo_ques, ...sql_ques, ...graphql_ques];
 
 // Custom components for ReactMarkdown
 const components = {
@@ -120,7 +121,7 @@ const DBPractice = () => {
     const [questionCount, setQuestionCount] = useState(50); // Default question count
     const [isActive, setIsActive] = useState(false);
     const [revisionsQuestions, setRevisionsQuestions] = useState(new Set());
-    const [selectedDatabase, setSelectedDatabase] = useState('All'); // Filter by database type
+    const [selectedDatabases, setSelectedDatabases] = useState(['MySQL', 'MongoDB', 'GraphQL']); // Multi-select databases
     const [selectedDifficulty, setSelectedDifficulty] = useState('All'); // Filter by difficulty
 
     // Check query editor state from window
@@ -130,10 +131,14 @@ const DBPractice = () => {
     const timerOptions = [30, 60, 90, 120, 150, 180];
     // Question count options
     const questionCountOptions = [25, 50, 75, 100];
-    // Database options
-    const databaseOptions = ['All', 'MySQL', 'MongoDB'];
-    // Difficulty options
-    const difficultyOptions = ['All', 'Easy', 'Medium', 'Hard'];
+    // Database options with labels and values
+    const databaseOptions = [
+        { value: 'MySQL', label: 'MySQL', color: '#4f46e5' },
+        { value: 'MongoDB', label: 'MongoDB', color: '#10b981' },
+        { value: 'GraphQL', label: 'GraphQL', color: '#f59e0b' }
+    ];
+    // Difficulty options (includes both "Easy" and "Basic" to accommodate different question sets)
+    const difficultyOptions = ['All', 'Easy', 'Basic', 'Medium', 'Hard'];
 
     // Utility function to get current date string
     const getCurrentDateString = () => {
@@ -142,7 +147,8 @@ const DBPractice = () => {
 
     // Utility function to get storage key
     const getStorageKey = () => {
-        return `db-practice-${getCurrentDateString()}-${questionCount}-${selectedDatabase}-${selectedDifficulty}`;
+        const dbString = selectedDatabases.sort().join('-');
+        return `db-practice-${getCurrentDateString()}-${questionCount}-${dbString}-${selectedDifficulty}`;
     };
 
     // Clean up old session data
@@ -209,9 +215,9 @@ const DBPractice = () => {
         // Generate new session if no saved session or forced new
         let filteredQuestions = [...all_questions];
 
-        // Filter by database
-        if (selectedDatabase !== 'All') {
-            filteredQuestions = filteredQuestions.filter(q => q.database === selectedDatabase);
+        // Filter by selected databases
+        if (selectedDatabases.length > 0) {
+            filteredQuestions = filteredQuestions.filter(q => selectedDatabases.includes(q.database));
         }
 
         // Filter by difficulty
@@ -236,14 +242,14 @@ const DBPractice = () => {
                 currentQuestionIndex: 0,
                 date: getCurrentDateString(),
                 count: questionCount,
-                database: selectedDatabase,
+                databases: selectedDatabases,
                 difficulty: selectedDifficulty
             };
             localStorage.setItem(storageKey, JSON.stringify(sessionData));
         } catch (error) {
             console.warn('Failed to save session:', error);
         }
-    }, [questionCount, selectedDatabase, selectedDifficulty]);
+    }, [questionCount, selectedDatabases, selectedDifficulty]);
 
     // Start timer with selected duration
     const startTimer = () => {
@@ -273,9 +279,35 @@ const DBPractice = () => {
         setTimeLeft(timerDuration * 60);
     };
 
-    // Handle database filter change
-    const handleDatabaseChange = (newDatabase) => {
-        setSelectedDatabase(newDatabase);
+    // Handle database selection change (checkbox toggle)
+    const handleDatabaseToggle = (database) => {
+        setSelectedDatabases(prev => {
+            const newSelection = prev.includes(database)
+                ? prev.filter(db => db !== database)
+                : [...prev, database];
+
+            // Prevent selecting no databases
+            if (newSelection.length === 0) {
+                return prev;
+            }
+
+            return newSelection;
+        });
+        setIsActive(false);
+        setTimeLeft(timerDuration * 60);
+    };
+
+    // Select all databases
+    const handleSelectAllDatabases = () => {
+        const allDbs = databaseOptions.map(db => db.value);
+        setSelectedDatabases(allDbs);
+        setIsActive(false);
+        setTimeLeft(timerDuration * 60);
+    };
+
+    // Clear all database selections (but keep at least one)
+    const handleClearAllDatabases = () => {
+        setSelectedDatabases(['MySQL']); // Keep at least MySQL selected
         setIsActive(false);
         setTimeLeft(timerDuration * 60);
     };
@@ -472,20 +504,93 @@ const DBPractice = () => {
                     )}
                 </div>
                 <div className="session-controls">
-                    <div className="filter-controls">
-                        <label>Database:</label>
-                        <select
-                            value={selectedDatabase}
-                            onChange={(e) => handleDatabaseChange(e.target.value)}
-                            disabled={isActive}
-                            className="filter-select"
-                        >
+                    <div className="database-selection-controls">
+                        <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                            Databases to Include:
+                        </label>
+                        <div className="database-checkboxes" style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '12px',
+                            alignItems: 'center',
+                            marginBottom: '8px'
+                        }}>
                             {databaseOptions.map(db => (
-                                <option key={db} value={db}>
-                                    {db}
-                                </option>
+                                <label
+                                    key={db.value}
+                                    className="database-checkbox-label"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        cursor: 'pointer',
+                                        padding: '6px 12px',
+                                        borderRadius: '6px',
+                                        backgroundColor: selectedDatabases.includes(db.value) ? db.color : '#f3f4f6',
+                                        color: selectedDatabases.includes(db.value) ? 'white' : '#374151',
+                                        fontWeight: '500',
+                                        fontSize: '0.9rem',
+                                        border: `2px solid ${selectedDatabases.includes(db.value) ? db.color : '#e5e7eb'}`,
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedDatabases.includes(db.value)}
+                                        onChange={() => handleDatabaseToggle(db.value)}
+                                        disabled={isActive}
+                                        style={{
+                                            margin: 0,
+                                            accentColor: db.color
+                                        }}
+                                    />
+                                    <span>{db.label}</span>
+                                </label>
                             ))}
-                        </select>
+                        </div>
+                        <div className="database-actions" style={{
+                            display: 'flex',
+                            gap: '8px',
+                            fontSize: '0.8rem'
+                        }}>
+                            <button
+                                onClick={handleSelectAllDatabases}
+                                disabled={isActive || selectedDatabases.length === databaseOptions.length}
+                                style={{
+                                    background: 'none',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                    color: '#6b7280',
+                                    fontSize: '0.8rem'
+                                }}
+                            >
+                                Select All
+                            </button>
+                            <button
+                                onClick={handleClearAllDatabases}
+                                disabled={isActive || selectedDatabases.length <= 1}
+                                style={{
+                                    background: 'none',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                    color: '#6b7280',
+                                    fontSize: '0.8rem'
+                                }}
+                            >
+                                Clear All
+                            </button>
+                            <span style={{
+                                color: '#6b7280',
+                                fontSize: '0.8rem',
+                                alignSelf: 'center'
+                            }}>
+                                ({selectedDatabases.length} selected)
+                            </span>
+                        </div>
                     </div>
                     <div className="filter-controls">
                         <label>Difficulty:</label>
@@ -649,8 +754,25 @@ const DBPractice = () => {
                     <span className="stat-value">{revisionsQuestions.size}/{questions.length}</span>
                 </div>
                 <div className="stat-item">
-                    <span className="stat-label">Database Type:</span>
-                    <span className="stat-value">{selectedDatabase}</span>
+                    <span className="stat-label">Databases:</span>
+                    <span className="stat-value" style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '4px'
+                    }}>
+                        {selectedDatabases.map((db, index) => (
+                            <span key={db} style={{
+                                background: databaseOptions.find(opt => opt.value === db)?.color || '#6b7280',
+                                color: 'white',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '0.8rem',
+                                fontWeight: '500'
+                            }}>
+                                {db}
+                            </span>
+                        ))}
+                    </span>
                 </div>
                 <div className="stat-item">
                     <span className="stat-label">Difficulty:</span>
@@ -658,7 +780,7 @@ const DBPractice = () => {
                 </div>
                 <div className="session-actions">
                     <button onClick={handleNewSession} className="new-session-btn">
-                        New Session ({questionCount} Questions)
+                        New Session ({questionCount} Questions from {selectedDatabases.join(', ')})
                     </button>
                 </div>
             </div>

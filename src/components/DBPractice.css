@@ -12,11 +12,22 @@
     box-sizing: border-box;
 }
 
+/* Compact layout when playground is open */
+.dual-component-container .db-practice {
+    padding: 12px 16px;
+}
+
 /* Header Styles */
 .practice-header {
     margin-bottom: 24px;
     border-bottom: 2px solid #e5e7eb;
     padding-bottom: 16px;
+}
+
+/* Compact header when playground is open */
+.dual-component-container .practice-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
 }
 
 .practice-header h2 {
@@ -26,11 +37,84 @@
     font-weight: 600;
 }
 
+/* Compact title when playground is open */
+.dual-component-container .practice-header h2 {
+    font-size: 20px;
+    margin: 0 0 8px 0;
+}
+
 .session-controls {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
     align-items: end;
+}
+
+/* Database Selection Styles */
+.database-selection-controls {
+    flex: 1;
+    min-width: 300px;
+}
+
+.database-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.database-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 2px solid;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.database-checkbox-label:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.database-checkbox-label input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.database-actions {
+    display: flex;
+    gap: 8px;
+    font-size: 0.8rem;
+    align-items: center;
+}
+
+.database-actions button {
+    background: none;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.database-actions button:hover:not(:disabled) {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.database-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .filter-controls,
@@ -723,6 +807,29 @@
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
+    }
+
+    .database-selection-controls {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .database-checkboxes {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .database-checkbox-label {
+        justify-content: flex-start;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .database-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 8px;
     }
 
     .filter-controls,

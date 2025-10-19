@@ -7,8 +7,13 @@
     line-height: 1.6;
 }
 
+/* Compact layout when playground is open */
+.dual-component-container .htmlcss-practice {
+    padding: 12px 16px;
+}
+
 .practice-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ab83e9 0%, #61ce9f 100%);
     color: white;
     padding: 15px 20px;
     border-radius: 12px;
@@ -16,11 +21,23 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Compact header when playground is open */
+.dual-component-container .practice-header {
+    padding: 8px 12px;
+    margin-bottom: 12px;
+}
+
 .practice-header h2 {
     margin: 0 0 10px 0;
     font-size: 1.8rem;
     font-weight: 600;
     text-align: center;
+}
+
+/* Compact title when playground is open */
+.dual-component-container .practice-header h2 {
+    font-size: 1.4rem;
+    margin: 0 0 6px 0;
 }
 
 .session-controls {

@@ -10,6 +10,11 @@
     box-sizing: border-box;
 }
 
+/* Compact layout when playground is open */
+.dual-component-container .javascript-practice {
+    padding: 12px 16px;
+}
+
 .practice-header {
     display: flex;
     justify-content: space-between;
@@ -21,10 +26,22 @@
     gap: 15px;
 }
 
+/* Compact header when playground is open */
+.dual-component-container .practice-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    gap: 8px;
+}
+
 .practice-header h2 {
     margin: 0;
     color: #333;
     font-size: 1.5rem;
+}
+
+/* Compact title when playground is open */
+.dual-component-container .practice-header h2 {
+    font-size: 1.2rem;
 }
 
 .session-controls {
@@ -32,6 +49,11 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
+}
+
+/* Compact session controls when playground is open */
+.dual-component-container .session-controls {
+    gap: 12px;
 }
 
 .timer-controls,
@@ -83,6 +105,12 @@
     flex-wrap: wrap;
 }
 
+/* Compact session info when playground is open */
+.dual-component-container .session-info {
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
 .toggle-playground-btn {
     padding: 10px 16px;
     background: #6366f1;
@@ -98,6 +126,13 @@
     gap: 8px;
     position: relative;
     box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+}
+
+/* Compact playground button when playground is open */
+.dual-component-container .toggle-playground-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    gap: 6px;
 }
 
 .toggle-playground-btn:hover {
@@ -171,6 +206,12 @@
     border-radius: 6px;
 }
 
+/* Compact timer when playground is open */
+.dual-component-container .time {
+    font-size: 1rem;
+    padding: 6px 10px;
+}
+
 .time.warning {
     color: #dc2626;
     background: #fef2f2;
@@ -222,6 +263,12 @@
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;
+}
+
+/* Compact question container when playground is open */
+.dual-component-container .question-container {
+    padding: 12px 16px;
+    margin-bottom: 12px;
 }
 
 .question-text-wrapper {
@@ -394,6 +441,13 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact navigation when playground is open */
+.dual-component-container .navigation-controls {
+    margin: 12px 0;
+    padding: 12px;
+    gap: 8px;
 }
 
 .nav-btn {

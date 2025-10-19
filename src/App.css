@@ -22,10 +22,19 @@ body {
 /* Tab Navigation Styles */
 .tab-navigation {
   display: flex;
-  background-color: #ffffff;
-  border-bottom: 2px solid #e5e7eb;
-  padding: 0;
-  margin: 0;
+  justify-content: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px 8px 0 0;
+  padding: 16px 24px 0 24px;
+}
+
+/* Compact tab navigation when playground is open */
+.dual-component-container .tab-navigation {
+  margin-bottom: 12px;
+  padding: 8px 16px 0 16px;
 }
 
 .tab-button {
@@ -163,6 +172,17 @@ body {
 }
 
 /* Responsive design for mobile */
+/* Compact mode optimizations for dual-component layout */
+.dual-component-container .tab-button {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.dual-component-container .component-wrapper {
+  padding: 8px 12px;
+}
+
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .app-container {
     min-height: 100vh;

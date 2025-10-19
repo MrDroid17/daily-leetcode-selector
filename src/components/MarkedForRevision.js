@@ -209,6 +209,63 @@ const MarkedForRevision = ({ onClose }) => {
         }
     };
 
+    // Download marked questions as markdown file
+    const handleDownloadMarkdown = () => {
+        if (markedQuestions.length === 0) {
+            alert('No questions marked for revision to download.');
+            return;
+        }
+
+        try {
+            const currentDate = getCurrentDateString();
+            let markdownContent = `# Revision Questions - ${currentDate}\n\n`;
+            markdownContent += `**Total Questions:** ${markedQuestions.length}\n\n`;
+            markdownContent += `---\n\n`;
+
+            markedQuestions.forEach((question, index) => {
+                markdownContent += `## ${index + 1}. ${question.source}\n\n`;
+
+                // Add badges/metadata
+                if (question.difficulty || question.category) {
+                    markdownContent += `**Metadata:** `;
+                    if (question.difficulty) {
+                        markdownContent += `Difficulty: ${question.difficulty} `;
+                    }
+                    if (question.category) {
+                        markdownContent += `| Category: ${question.category}`;
+                    }
+                    markdownContent += `\n\n`;
+                }
+
+                // Add question
+                markdownContent += `### 🤔 Question:\n\n`;
+                markdownContent += `${question.question}\n\n`;
+
+                // Add solution
+                markdownContent += `### 💡 Solution:\n\n`;
+                markdownContent += `${question.solution}\n\n`;
+
+                markdownContent += `---\n\n`;
+            });
+
+            // Create and download file
+            const blob = new Blob([markdownContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${currentDate}_revision_ques.md`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert(`Downloaded ${markedQuestions.length} questions to ${currentDate}_revision_ques.md`);
+        } catch (error) {
+            console.error('Error downloading markdown file:', error);
+            alert('Error downloading file. Please try again.');
+        }
+    };
+
     // Load marked questions on component mount
     useEffect(() => {
         loadMarkedQuestions();
@@ -284,20 +341,40 @@ const MarkedForRevision = ({ onClose }) => {
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         {markedQuestions.length > 0 && (
-                            <button
-                                onClick={handleClearAllMarked}
-                                style={{
-                                    background: '#ef4444',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    padding: '6px 12px',
-                                    fontSize: '12px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                🗑️ Clear All
-                            </button>
+                            <>
+                                <button
+                                    onClick={handleDownloadMarkdown}
+                                    style={{
+                                        background: '#10b981',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        padding: '6px 12px',
+                                        fontSize: '12px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}
+                                    title="Download all marked questions as markdown file"
+                                >
+                                    💾 Download MD
+                                </button>
+                                <button
+                                    onClick={handleClearAllMarked}
+                                    style={{
+                                        background: '#ef4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        padding: '6px 12px',
+                                        fontSize: '12px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    🗑️ Clear All
+                                </button>
+                            </>
                         )}
                         <button
                             onClick={onClose}

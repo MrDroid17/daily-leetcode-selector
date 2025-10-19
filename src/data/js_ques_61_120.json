@@ -393,9 +393,9 @@
     },
     {
         "id": 110,
-        "question": "## Suggest your question!",
-        "example": "```javascript\n// This is a placeholder for community-contributed questions\n// Users can suggest their own JavaScript interview questions\n\n// Example suggestion format:\nfunction exampleQuestion() {\n    // Your creative JavaScript code here\n    console.log('What would be the output?');\n}\n\n// Common areas for suggestions:\n// - Closures and scope\n// - Prototype chains\n// - Async programming\n// - ES6+ features\n// - Event handling\n// - Type coercion\n```",
-        "solution": "**This is an open question for community contributions.**\n\n**How to contribute:**\n1. Think of an interesting JavaScript concept that could trip up developers\n2. Write code that demonstrates edge cases or unexpected behavior\n3. Provide multiple choice answers\n4. Include a detailed explanation\n\n**Good question characteristics:**\n- Tests understanding of core JavaScript concepts\n- Has a non-obvious answer that requires careful thinking\n- Teaches something valuable about the language\n- Covers common interview topics or real-world scenarios",
+        "question": "## Add a new Question here",
+        "example": "```javascript\n```",
+        "solution": "",
         "category": "Community",
         "difficulty": "Variable"
     },
