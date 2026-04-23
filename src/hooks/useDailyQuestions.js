@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { LeetCodeSolved, LeetCodeBlind75 } from "../LeetCodeData";
 
-const NUMBER_OF_QUESTIONS = 5; // Number of questions to display
+const NUMBER_OF_QUESTIONS = 3; // Number of questions to display
 
 
 function getRandomQuestions() {
