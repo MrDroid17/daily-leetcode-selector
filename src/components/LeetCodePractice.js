@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { RefreshCcw } from "lucide-react";
 import { useDailyQuestions } from "../hooks/useDailyQuestions";
+import { LeetCodeSolved } from "../LeetCodeData";
 import "./LeetCodePractice.css";
 import "../Modal.css";
 
@@ -28,7 +29,7 @@ const LeetCodePractice = () => {
     return (
         <div className="leetcode-practice">
             <h2 className="title">DSA Practice</h2>
-            <p className="question-count">Total Questions: {questions.length}</p>
+            <p className="question-count">Total Questions: {LeetCodeSolved.length}</p>
             <table className="table">
                 <thead>
                     <tr>

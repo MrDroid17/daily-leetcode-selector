@@ -25,7 +25,8 @@
 .leetcode-practice .question-count {
     margin: -8px 0 16px;
     color: #666;
-    font-size: 0.95rem;
+    font-weight: 700;
+    font-size: 1.95rem;
 }
 
 /* Compact title when playground is open */
