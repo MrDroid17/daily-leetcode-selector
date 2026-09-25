@@ -28,6 +28,7 @@ const LeetCodePractice = () => {
     return (
         <div className="leetcode-practice">
             <h2 className="title">DSA Practice</h2>
+            <p className="question-count">Total Questions: {questions.length}</p>
             <table className="table">
                 <thead>
                     <tr>
